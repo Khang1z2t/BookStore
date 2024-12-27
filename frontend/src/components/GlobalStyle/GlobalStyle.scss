@@ -1,0 +1,21 @@
+@import 'normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Arizonia&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --primary: #f15d30
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 1.6rem;
+}
