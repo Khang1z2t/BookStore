@@ -16,20 +16,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Slf4j
 public class UserController {
-    UserService userService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/register")
-    private ApiResponse<UserResponse> register(@RequestBody @Valid UserRequest request) {
+    ApiResponse<UserResponse> register(@RequestBody @Valid UserRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.register(request))
                 .build();
     }
 
-    @GetMapping("/profiles")
+    @GetMapping("/users")
     ApiResponse<List<UserResponse>> getAllProfiles() {
         return ApiResponse.<List<UserResponse>>builder()
                 .result(userService.getAllUsers())

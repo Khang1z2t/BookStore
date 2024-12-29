@@ -19,6 +19,7 @@ public class UserResponse {
     String firstName;
     String lastName;
     String phone;
+    String address;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate birthday;
 }

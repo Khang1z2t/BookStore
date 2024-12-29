@@ -25,6 +25,9 @@ public class User {
     @Column(name = "email", length = 100)
     private String email;
 
+    @Column(name = "username", length = Integer.MAX_VALUE)
+    private String username;
+
     @Column(name = "firstname", length = Integer.MAX_VALUE)
     private String firstName;
 
