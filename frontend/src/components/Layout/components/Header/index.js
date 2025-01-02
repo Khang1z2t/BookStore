@@ -41,7 +41,7 @@ function Header() {
     };
 
     return (
-        <AppBar position="static" sx={{backgroundColor: '#000000'}}>
+        <AppBar position="sticky" sx={{backgroundColor: '#000000'}}>
             <Container>
                 <Toolbar disableGutters>
                     <IconButton size="large" edge="start" color="inherit" aria-label="logo" component={Link} to="/">

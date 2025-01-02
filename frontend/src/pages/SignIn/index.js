@@ -14,7 +14,7 @@ import BookIcon from '@mui/icons-material/Book';
 import {Card, SignInContainer} from '~/components/SignIn'
 import ForgotPassword from "~/components/ForgotPassword";
 import {FacebookIcon, GoogleIcon} from "~/components/CustomIcon";
-import './SignIn.module.scss';
+import styles from './SignIn.module.scss';
 
 function SignIn({disableCustomTheme}) {
     const [emailError, setEmailError] = React.useState(false);
@@ -72,7 +72,7 @@ function SignIn({disableCustomTheme}) {
     return (
         <>
             <CssBaseline enableColorScheme/>
-            <SignInContainer direction="column" justifyContent="space-between">
+            <SignInContainer className={styles.SignInContainer} direction="column" justifyContent="space-between" >
                 <Card variant="outlined">
                     <BookIcon/>
                     <Typography
@@ -94,7 +94,7 @@ function SignIn({disableCustomTheme}) {
                         }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="email">Email</FormLabel>
+                            <FormLabel htmlFor="email" sx={{userSelect: 'none'}}>Email</FormLabel>
                             <TextField
                                 error={emailError}
                                 helperText={emailErrorMessage}
@@ -111,7 +111,7 @@ function SignIn({disableCustomTheme}) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="password">Password</FormLabel>
+                            <FormLabel htmlFor="password" sx={{userSelect: 'none'}}>Password</FormLabel>
                             <TextField
                                 error={passwordError}
                                 helperText={passwordErrorMessage}
@@ -130,6 +130,7 @@ function SignIn({disableCustomTheme}) {
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary"/>}
                             label="Remember me"
+                            sx={{userSelect: 'none'}}
                         />
                         <ForgotPassword open={open} handleClose={handleClose}/>
                         <Button
@@ -141,8 +142,8 @@ function SignIn({disableCustomTheme}) {
                         >
                             Sign in
                         </Button>
-                        <Link
-                            component="button"
+                        <Typography
+                            component={Link}
                             type="button"
                             onClick={handleClickOpen}
                             variant="body2"
@@ -152,7 +153,7 @@ function SignIn({disableCustomTheme}) {
                             }}
                         >
                             Forgot your password?
-                        </Link>
+                        </Typography>
                     </Box>
                     <Divider>or</Divider>
                     <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -180,7 +181,11 @@ function SignIn({disableCustomTheme}) {
                                 component={Link}
                                 to="/register"
                                 variant="body2"
-                                sx={{alignSelf: 'center', color: '#000', fontWeight: '600'}}
+                                sx={{
+                                    alignSelf: 'center', color: '#000',
+                                    fontWeight: '600',
+                                    textDecoration: 'none'
+                                }}
                             >
                                 Sign up
                             </Typography>

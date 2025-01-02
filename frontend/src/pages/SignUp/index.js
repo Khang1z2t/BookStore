@@ -15,7 +15,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import {styled} from '@mui/material/styles';
 import {FacebookIcon, GoogleIcon} from "~/components/CustomIcon";
-
+import styles from './SignUp.module.scss';
 
 const Card = styled(MuiCard)(({theme}) => ({
     display: 'flex',
@@ -121,7 +121,7 @@ function SignUp({disableCustomTheme}) {
     return (
         <>
             <CssBaseline enableColorScheme/>
-            <SignUpContainer direction="column" justifyContent="space-between">
+            <SignUpContainer className={styles.SignUpContainer} direction="column" justifyContent="space-between">
                 <Card variant="outlined">
                     <BookIcon/>
                     <Typography
@@ -137,7 +137,7 @@ function SignUp({disableCustomTheme}) {
                         sx={{display: 'flex', flexDirection: 'column', gap: 2}}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="name">Full name</FormLabel>
+                            <FormLabel htmlFor="name" sx={{userSelect: 'none'}}>Full name</FormLabel>
                             <TextField
                                 autoComplete="name"
                                 name="name"
@@ -151,7 +151,7 @@ function SignUp({disableCustomTheme}) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="email">Email</FormLabel>
+                            <FormLabel htmlFor="email" sx={{userSelect: 'none'}}>Email</FormLabel>
                             <TextField
                                 required
                                 fullWidth
@@ -166,7 +166,7 @@ function SignUp({disableCustomTheme}) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="password">Password</FormLabel>
+                            <FormLabel htmlFor="password" sx={{userSelect: 'none'}}>Password</FormLabel>
                             <TextField
                                 required
                                 fullWidth
@@ -226,7 +226,11 @@ function SignUp({disableCustomTheme}) {
                                 component={Link}
                                 to="/login"
                                 variant="body2"
-                                sx={{alignSelf: 'center', color: '#000', fontWeight: '600'}}
+                                sx={{
+                                    alignSelf: 'center', color: '#000',
+                                    fontWeight: '600',
+                                    textDecoration: 'none'
+                                }}
                             >
                                 Sign in
                             </Typography>

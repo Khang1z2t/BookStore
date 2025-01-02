@@ -10,4 +10,6 @@ public interface UserService {
     public List<UserResponse> getAllUsers();
 
     public UserResponse register(UserRequest request);
+
+    public UserResponse getUserProfile();
 }

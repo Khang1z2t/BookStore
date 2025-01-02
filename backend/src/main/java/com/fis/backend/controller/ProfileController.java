@@ -6,13 +6,12 @@ import com.fis.backend.dto.response.UserResponse;
 import com.fis.backend.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/user")
-public class UserController {
+public class ProfileController {
     @Autowired
     private UserService userService;
 
@@ -20,20 +19,6 @@ public class UserController {
     ApiResponse<UserResponse> register(@RequestBody @Valid UserRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.register(request))
-                .build();
-    }
-
-    @GetMapping("/users")
-    ApiResponse<List<UserResponse>> getAllProfiles() {
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getAllUsers())
-                .build();
-    }
-
-    @GetMapping("/profile")
-    ApiResponse<UserResponse> getProfile() {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getUserProfile())
                 .build();
     }
 }

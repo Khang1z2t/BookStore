@@ -5,6 +5,8 @@ import com.fis.backend.dto.identity.TokenExchangeParam;
 import com.fis.backend.dto.identity.UserCreationParam;
 import com.fis.backend.dto.request.UserRequest;
 import com.fis.backend.dto.response.UserResponse;
+import com.fis.backend.exception.AppException;
+import com.fis.backend.exception.ErrorCode;
 import com.fis.backend.exception.ErrorNormalizer;
 import com.fis.backend.mapper.UserMapper;
 import com.fis.backend.repository.IdentityClient;
@@ -16,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,11 +43,13 @@ public class UserServiceImpl implements UserService {
     @NonFinal
     String clientSecret;
 
+    @Override
     public List<UserResponse> getAllUsers() {
         var users = userReponsitory.findAll();
         return users.stream().map(userMapper::toUserResponse).toList();
     }
 
+    @Override
     public UserResponse register(UserRequest request) {
         try {
             // Create account in KeyCloak
@@ -87,6 +91,17 @@ public class UserServiceImpl implements UserService {
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
         }
+    }
+
+    @Override
+    public UserResponse getUserProfile() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String profileId = authentication.getName();
+
+        var user = userReponsitory.findByProfileId(profileId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        return userMapper.toUserResponse(user);
     }
 
     private String extractProfileId(ResponseEntity<?> response) {

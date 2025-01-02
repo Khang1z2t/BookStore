@@ -4,7 +4,6 @@ import com.fis.backend.dto.identity.TokenExchangeParam;
 import com.fis.backend.dto.identity.TokenExchangeResponse;
 import com.fis.backend.dto.identity.UserCreationParam;
 import feign.QueryMap;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

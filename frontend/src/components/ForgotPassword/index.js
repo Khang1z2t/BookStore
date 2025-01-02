@@ -32,11 +32,12 @@ function ForgotPassword({open, handleClose}) {
                     placeholder="Email address"
                     type="email"
                     fullWidth
+                    color='inherit'
                 />
             </DialogContent>
             <DialogActions sx={{pb: 3, px: 3}}>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button variant="contained" type="submit">
+                <Button onClick={handleClose} color='inherit'>Cancel</Button>
+                <Button variant="contained" type="submit" color='inherit'>
                     Continue
                 </Button>
             </DialogActions>

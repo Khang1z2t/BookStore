@@ -1,7 +1,8 @@
 import axios from "axios";
+import config from "~/config";
 
 const httpRequest = axios.create({
-    baseURL: '',
+    baseURL: config.baseUrl,
 })
 
 export const get = async (path, options = {}) => {
