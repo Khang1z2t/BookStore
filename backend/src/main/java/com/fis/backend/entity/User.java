@@ -44,4 +44,7 @@ public class User {
     @Column(name = "birthday")
     private LocalDate birthday;
 
+    @Column(name = "avatar_url", length = Integer.MAX_VALUE)
+    private String avatarUrl;
+
 }

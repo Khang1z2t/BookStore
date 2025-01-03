@@ -22,7 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     IdentityClient identityClient;
     ErrorNormalizer errorNormalizer;
+    GoogleDriveService googleDriveService;
 
     @Value("${idp.client-id}")
     @NonFinal
@@ -82,14 +85,18 @@ public class UserServiceImpl implements UserService {
                             .build());
 
             var profileId = extractProfileId(creationResponse);
-            var user = userMapper.toUser(request);
-            user.setProfileId(profileId);
+            String avt = googleDriveService.uploadImageToDrive(request.getAvatarUrl());
 
+            var user = userMapper.toUser(request);
+            user.setAvatarUrl(avt);
+            user.setProfileId(profileId);
             user = userReponsitory.save(user);
 
             return userMapper.toUserResponse(user);
         } catch (FeignException e) {
             throw errorNormalizer.handleKeyCloakException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -102,6 +109,12 @@ public class UserServiceImpl implements UserService {
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public String uploadImage(MultipartFile file) throws IOException {
+        String url = googleDriveService.uploadImageToDrive(file);
+        return url;
     }
 
     private String extractProfileId(ResponseEntity<?> response) {

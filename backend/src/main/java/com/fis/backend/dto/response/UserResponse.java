@@ -22,4 +22,5 @@ public class UserResponse {
     String address;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate birthday;
+    String avatarUrl;
 }
