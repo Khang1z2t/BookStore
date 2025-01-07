@@ -1,13 +1,17 @@
 package com.fis.backend.controller;
 
 import com.fis.backend.dto.ApiResponse;
-import com.fis.backend.dto.request.UserRequest;
+import com.fis.backend.dto.request.LoginRequest;
+import com.fis.backend.dto.request.RegistrationRequest;
+import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
+import com.fis.backend.services.KeycloakService;
 import com.fis.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,38 +26,46 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private KeycloakService keycloakService;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "API đăng kí tài khoản mới")
-    ApiResponse<UserResponse> register(@ModelAttribute UserRequest request) {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.register(request))
-                .build();
+    ResponseEntity<ApiResponse<UserResponse>> register(@ModelAttribute RegistrationRequest request) {
+        return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
+                .data(keycloakService.register(request))
+                .build());
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('ADMIN')")
     ApiResponse<List<UserResponse>> getAllProfiles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         return ApiResponse.<List<UserResponse>>builder()
                 .code(200)
-                .result(userService.getAllUsers())
+                .data(userService.getAllUsers())
                 .build();
     }
 
     @GetMapping("/profile")
-    ApiResponse<UserResponse> getProfile() {
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getUserProfile())
-                .build();
+    ResponseEntity<ApiResponse<UserResponse>> getProfile() {
+        return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
+                .data(userService.getUserProfile())
+                .build());
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "API đăng nhập")
+    ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(ApiResponse.<AuthenticationResponse>builder()
+                .data(keycloakService.login(request))
+                .build());
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "API tải hình ảnh")
     ApiResponse<String> register(@RequestPart(name = "fileImg", required = true) MultipartFile fileImg) throws IOException {
         return ApiResponse.<String>builder()
-                .result(userService.uploadImage(fileImg))
+                .data(userService.uploadImage(fileImg))
                 .build();
     }
 }

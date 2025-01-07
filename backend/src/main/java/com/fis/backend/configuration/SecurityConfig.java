@@ -16,10 +16,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/user/register",
+            // -- Swagger UI v3 (OpenAPI)
+            "/swagger-ui.html",
             "/swagger-ui/**",
+            "/api-docs/**",
             "/v3/api-docs/**",
-            "/api/v1/user/upload"
+            // -- Api v1
+            "/api/v1/user/register",
+            "/api/v1/user/upload",
+            "/api/v1/user/login",
     };
 
     @Bean

@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Enviroment / Secret / KEYS ###
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env*.local
+
+!/src/main/resources/credentials.json

@@ -5,18 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRequest {
+public class RegistrationRequest {
     @Size(min = 4, message = "INVALID_USERNAME")
     @Schema(description = "Tên đăng nhập", example = "user123")
     String username;
@@ -28,10 +23,4 @@ public class UserRequest {
     String email;
     String firstName;
     String lastName;
-    String phone;
-    String address;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate birthday;
-    @Nullable
-    MultipartFile avatarUrl;
 }

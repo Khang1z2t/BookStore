@@ -1,5 +1,5 @@
-import React from 'react'
-import {Link} from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -11,14 +11,17 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import BookIcon from '@mui/icons-material/Book';
-import {Card, SignInContainer} from '~/components/SignIn'
-import ForgotPassword from "~/components/ForgotPassword";
-import {FacebookIcon, GoogleIcon} from "~/components/CustomIcon";
+import { Card, SignInContainer } from '~/components/SignIn';
+import ForgotPassword from '~/components/ForgotPassword';
+import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
 import styles from './SignIn.module.scss';
+import httpRequest from "~/utils/httpRequest";
 
-function SignIn({disableCustomTheme}) {
-    const [emailError, setEmailError] = React.useState(false);
-    const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+function SignIn({ disableCustomTheme }) {
+    const [username, setUsername] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [usernameError, setUsernameError] = React.useState(false);
+    const [usernameErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
@@ -31,30 +34,36 @@ function SignIn({disableCustomTheme}) {
         setOpen(false);
     };
 
-    const handleSubmit = (event) => {
-        if (emailError || passwordError) {
-            event.preventDefault();
-            return;
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (username && password) {
+            alert(`Username: ${username}\nPassword: ${password}`);
+            const response = await loginUser(username, password);
+            console.log(response);
         }
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
     };
 
     const validateInputs = () => {
-        const email = document.getElementById('email');
+        const username = document.getElementById('username');
         const password = document.getElementById('password');
 
         let isValid = true;
 
-        if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-            setEmailError(true);
+        // if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+        //     setEmailError(true);
+        //     setEmailErrorMessage('Please enter a valid email address.');
+        //     isValid = false;
+        // } else {
+        //     setEmailError(false);
+        //     setEmailErrorMessage('');
+        // }
+
+        if (!username.value) {
+            setUsernameError(true);
             setEmailErrorMessage('Please enter a valid email address.');
             isValid = false;
         } else {
-            setEmailError(false);
+            setUsernameError(false);
             setEmailErrorMessage('');
         }
 
@@ -69,16 +78,21 @@ function SignIn({disableCustomTheme}) {
 
         return isValid;
     };
+
+    const loginUser = async (username, password) => {
+        const response = await httpRequest.post('/api/v1/user/login', {username,password});
+        return response.data;
+    }
     return (
         <>
-            <CssBaseline enableColorScheme/>
-            <SignInContainer className={styles.SignInContainer} direction="column" justifyContent="space-between" >
+            <CssBaseline enableColorScheme />
+            <SignInContainer className={styles.SignInContainer} direction="column" justifyContent="space-between">
                 <Card variant="outlined">
-                    <BookIcon/>
+                    <BookIcon />
                     <Typography
                         component="h1"
                         variant="h4"
-                        sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)'}}
+                        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
                     >
                         Sign in
                     </Typography>
@@ -94,24 +108,29 @@ function SignIn({disableCustomTheme}) {
                         }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="email" sx={{userSelect: 'none'}}>Email</FormLabel>
+                            <FormLabel htmlFor="username" sx={{ userSelect: 'none' }}>
+                                Username
+                            </FormLabel>
                             <TextField
-                                error={emailError}
-                                helperText={emailErrorMessage}
-                                id="email"
-                                type="email"
-                                name="email"
+                                error={usernameError}
+                                helperText={usernameErrorMessage}
+                                id="username"
+                                type="text"
+                                name="username"
                                 placeholder="your@email.com"
-                                autoComplete="email"
+                                autoComplete="username"
                                 autoFocus
                                 required
                                 fullWidth
+                                onChange={(e) => setUsername(e.target.value)}
                                 variant="outlined"
-                                color={emailError ? 'error' : 'inherit'}
+                                color={usernameError ? 'error' : 'inherit'}
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="password" sx={{userSelect: 'none'}}>Password</FormLabel>
+                            <FormLabel htmlFor="password" sx={{ userSelect: 'none' }}>
+                                Password
+                            </FormLabel>
                             <TextField
                                 error={passwordError}
                                 helperText={passwordErrorMessage}
@@ -123,23 +142,18 @@ function SignIn({disableCustomTheme}) {
                                 autoFocus
                                 required
                                 fullWidth
+                                onChange={(e) => setPassword(e.target.value)}
                                 variant="outlined"
                                 color={passwordError ? 'error' : 'inherit'}
                             />
                         </FormControl>
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="primary"/>}
+                            control={<Checkbox value="remember" color="inherit" />}
                             label="Remember me"
-                            sx={{userSelect: 'none'}}
+                            sx={{ userSelect: 'none' }}
                         />
-                        <ForgotPassword open={open} handleClose={handleClose}/>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            onClick={validateInputs}
-                            color='inherit'
-                        >
+                        <ForgotPassword open={open} handleClose={handleClose} />
+                        <Button type="submit" fullWidth variant="contained" onClick={validateInputs} color="inherit">
                             Sign in
                         </Button>
                         <Typography
@@ -148,21 +162,22 @@ function SignIn({disableCustomTheme}) {
                             onClick={handleClickOpen}
                             variant="body2"
                             sx={{
-                                alignSelf: 'center', color: '#000',
-                                textDecoration: 'none'
+                                alignSelf: 'center',
+                                color: '#000',
+                                textDecoration: 'none',
                             }}
                         >
                             Forgot your password?
                         </Typography>
                     </Box>
                     <Divider>or</Divider>
-                    <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Button
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign in with Google')}
-                            startIcon={<GoogleIcon/>}
-                            color='inherit'
+                            startIcon={<GoogleIcon />}
+                            color="inherit"
                         >
                             Sign in with Google
                         </Button>
@@ -170,21 +185,22 @@ function SignIn({disableCustomTheme}) {
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign in with Facebook')}
-                            startIcon={<FacebookIcon/>}
-                            color='inherit'
+                            startIcon={<FacebookIcon />}
+                            color="inherit"
                         >
                             Sign in with Facebook
                         </Button>
-                        <Typography sx={{textAlign: 'center'}}>
+                        <Typography sx={{ textAlign: 'center' }}>
                             Don&apos;t have an account?{' '}
                             <Typography
                                 component={Link}
                                 to="/register"
                                 variant="body2"
                                 sx={{
-                                    alignSelf: 'center', color: '#000',
+                                    alignSelf: 'center',
+                                    color: '#000',
                                     fontWeight: '600',
-                                    textDecoration: 'none'
+                                    textDecoration: 'none',
                                 }}
                             >
                                 Sign up
@@ -194,7 +210,7 @@ function SignIn({disableCustomTheme}) {
                 </Card>
             </SignInContainer>
         </>
-    )
+    );
 }
 
-export default SignIn
+export default SignIn;
