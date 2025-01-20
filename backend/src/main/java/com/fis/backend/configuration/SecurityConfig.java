@@ -22,9 +22,7 @@ public class SecurityConfig {
             "/api-docs/**",
             "/v3/api-docs/**",
             // -- Api v1
-            "/api/v1/user/register",
-            "/api/v1/user/upload",
-            "/api/v1/user/login",
+            "/api/v1/**",
     };
 
     @Bean
@@ -50,8 +48,6 @@ public class SecurityConfig {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new CustomAuthoritiesConverter());
-
-
         return jwtAuthenticationConverter;
     }
 }

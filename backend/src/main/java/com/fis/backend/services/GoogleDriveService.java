@@ -1,5 +1,6 @@
 package com.fis.backend.services;
 
+import com.fis.backend.exception.AppException;
 import com.fis.backend.utils.enums.FolderType;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -17,9 +18,6 @@ import java.util.Collections;
 
 
 public interface GoogleDriveService {
-    String uploadImageToDrive(MultipartFile file) throws IOException;
-
-    String uploadImageToDrive(MultipartFile file, FolderType type) throws IOException;
-
-
+    String uploadImageToDrive(MultipartFile file);
+    String uploadImageToDrive(MultipartFile file, FolderType type);
 }

@@ -40,4 +40,4 @@ build/
 .env.production
 .env*.local
 
-!/src/main/resources/credentials.json
+/src/main/resources/bookstore-446704-e62163826a32.json

@@ -68,6 +68,7 @@ function SignUp({ disableCustomTheme }) {
 
     const validateInputs = () => {
         const email = document.getElementById('email');
+        const username = document.getElementById('username');
         const password = document.getElementById('password');
         const firstName = document.getElementById('firstName');
         const lastName = document.getElementById('lastName');
@@ -83,6 +84,15 @@ function SignUp({ disableCustomTheme }) {
             setEmailErrorMessage('');
         }
 
+        if (!username.value || username.value.length < 4) {
+            setPasswordError(true);
+            setPasswordErrorMessage('Username must be at least 4 characters long.');
+            isValid = false;
+        } else {
+            setPasswordError(false);
+            setPasswordErrorMessage('');
+        }
+
         if (!password.value || password.value.length < 6) {
             setPasswordError(true);
             setPasswordErrorMessage('Password must be at least 6 characters long.');
@@ -92,7 +102,7 @@ function SignUp({ disableCustomTheme }) {
             setPasswordErrorMessage('');
         }
 
-        if (!firstName.value || firstName.value.length < 1) {
+        if (!firstName.value) {
             setFirstNameError(true);
             setFirstNameErrorMessage('First Name is required.');
             isValid = false;
@@ -101,9 +111,9 @@ function SignUp({ disableCustomTheme }) {
             setFirstNameErrorMessage('');
         }
 
-        if (!lastName.value || lastName.value.length < 1) {
+        if (!lastName.value) {
             setLastNameError(true);
-            setLastNameErrorMessage('First Name is required.');
+            setLastNameErrorMessage('Last Name is required.');
             isValid = false;
         } else {
             setLastNameError(false);
@@ -114,7 +124,7 @@ function SignUp({ disableCustomTheme }) {
     };
 
     const handleSubmit = (event) => {
-        if (firstNameError || lastNameError || emailError || passwordError) {
+        if (firstNameError || lastNameError || usernameError || emailError || passwordError) {
             event.preventDefault();
             return;
         }
@@ -161,15 +171,15 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="name" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="lastName" sx={{ userSelect: 'none' }}>
                                 Last name
                             </FormLabel>
                             <TextField
-                                autoComplete="name"
-                                name="name"
+                                autoComplete="lastName"
+                                name="lastName"
                                 required
                                 fullWidth
-                                id="name"
+                                id="lastName"
                                 placeholder="Last name"
                                 error={lastNameError}
                                 helperText={lastNameErrorMessage}

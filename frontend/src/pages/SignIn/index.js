@@ -15,7 +15,10 @@ import { Card, SignInContainer } from '~/components/SignIn';
 import ForgotPassword from '~/components/ForgotPassword';
 import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
 import styles from './SignIn.module.scss';
-import httpRequest from "~/utils/httpRequest";
+import {useAlerts} from "~/context/AlertsContext";
+import {loginUser, test} from "~/services/AuthService";
+import axios from "axios";
+
 
 function SignIn({ disableCustomTheme }) {
     const [username, setUsername] = React.useState('');
@@ -25,6 +28,7 @@ function SignIn({ disableCustomTheme }) {
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
+    const { showAlert } = useAlerts();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -37,10 +41,19 @@ function SignIn({ disableCustomTheme }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (username && password) {
-            alert(`Username: ${username}\nPassword: ${password}`);
-            const response = await loginUser(username, password);
-            console.log(response);
+            try {
+                const response = await loginUser(username, password);
+                showAlert('Login successful', 'success');
+                const token = response.data;
+                console.log('Token:', token);
+                const user = await test(token);
+                console.log('User:', user);
+            } catch (error) {
+                showAlert(error.response.data.message, 'error');
+                console.error('Login failed:', error.response.data.message);
+            }
         }
+
     };
 
     const validateInputs = () => {
@@ -48,15 +61,6 @@ function SignIn({ disableCustomTheme }) {
         const password = document.getElementById('password');
 
         let isValid = true;
-
-        // if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-        //     setEmailError(true);
-        //     setEmailErrorMessage('Please enter a valid email address.');
-        //     isValid = false;
-        // } else {
-        //     setEmailError(false);
-        //     setEmailErrorMessage('');
-        // }
 
         if (!username.value) {
             setUsernameError(true);
@@ -79,10 +83,6 @@ function SignIn({ disableCustomTheme }) {
         return isValid;
     };
 
-    const loginUser = async (username, password) => {
-        const response = await httpRequest.post('/api/v1/user/login', {username,password});
-        return response.data;
-    }
     return (
         <>
             <CssBaseline enableColorScheme />

@@ -16,6 +16,8 @@ public enum ErrorCode {
     USER_EXISTED(1009, "Username existed, please choose another one", HttpStatus.BAD_REQUEST),
     USERNAME_IS_MISSING(1010, "Please enter username", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1011, "User not existed", HttpStatus.BAD_REQUEST),
+    INVALID_USERNAME_PASSWORD(1012, "Invalid username or password", HttpStatus.UNAUTHORIZED),
+    INVALID_DRIVE_TOKEN(1013, "Invalid drive token", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -5,6 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import GlobalStyles from "~/components/GlobalStyle";
 import keycloak from "./keycloak";
 import {Box, CircularProgress} from "@mui/material";
+import {AlertsProvider} from "~/context/AlertsContext";
 
 function Main() {
     const [keycloakInitialized, setKeycloakInitialized] = useState(false);
@@ -47,7 +48,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
         <GlobalStyles>
-            <App/>
+            <AlertsProvider>
+                <App/>
+            </AlertsProvider>
         </GlobalStyles>
     </React.StrictMode>
 );
