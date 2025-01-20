@@ -6,6 +6,7 @@ import com.fis.backend.dto.request.RegistrationRequest;
 import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
+import com.fis.backend.entity.User;
 import com.fis.backend.exception.AppException;
 import com.fis.backend.exception.ErrorCode;
 import com.fis.backend.exception.ErrorNormalizer;
@@ -23,8 +24,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService {
     GoogleDriveService googleDriveService;
     KeycloakRepository keycloakRepository;
     ErrorNormalizer errorNormalizer;
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Value("${keycloak.client-id}")
     @NonFinal
@@ -49,41 +52,23 @@ public class UserServiceImpl implements UserService {
     String clientSecret;
 
     @Override
+    @Transactional
     public UserResponse register(RegistrationRequest request) {
-        try {
-            // Create account in KeyCloak
-            // Exchange client Token
-            var token = getClientToken();
-            // Create user with client Token and given info
-
-            // Get profileId of keyCloak account
-            var creationResponse = keycloakRepository.createUser(
-                    "Bearer " + token.getAccessToken(),
-                    UserCreationParam.builder()
-                            .username(request.getUsername())
-                            .firstName(request.getFirstName())
-                            .lastName(request.getLastName())
-                            .email(request.getEmail())
-                            .enabled(true)
-                            .emailVerified(false)
-                            .credentials(List.of(Credential.builder()
-                                    .type("password")
-                                    .value(request.getPassword())
-                                    .temporary(false)
-                                    .build()))
-                            .build());
-
-            var profileId = extractProfileId(creationResponse);
-
-            var user = userMapper.toUser(request);
-            user.setProfileId(profileId);
-            user.setAvatarUrl("https://drive.google.com/file/d/120KeZyc7Udd0bx0A94Ser03rxZRnfuu4/view?usp=drive_link");
-            user = userRepository.save(user);
-
-            return userMapper.toUserResponse(user);
-        } catch (FeignException e) {
-            throw errorNormalizer.handleKeyCloakException(e);
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
         }
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        User user = userMapper.toUser(request);
+
+        String encodePassword = bCryptPasswordEncoder.encode(request.getPassword());
+        user.setPassword(encodePassword);
+
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -114,55 +99,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse updateUser(UserUpdateRequest request) {
+        Long userId = AuthenUtil.getUserId();
+
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        userMapper.updateUser(user, request);
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public Boolean deleteUser(Long userId) {
         try {
-            var user = userRepository.findByProfileId(AuthenUtil.getProfileId()).orElseThrow(
+            User user = userRepository.findById(userId).orElseThrow(
                     () -> new AppException(ErrorCode.USER_NOT_EXISTED));
-            var token = getClientToken();
-
-            var response = keycloakRepository.updateUser(
-                    "Bearer " + token.getAccessToken(),
-                    user.getProfileId(),
-                    UserUpdateParam.builder()
-                            .email(request.getEmail())
-                            .firstName(request.getFirstName())
-                            .lastName(request.getLastName())
-                            .enabled(true)
-                            .build());
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new AppException(ErrorCode.USER_NOT_EXISTED); //USER_UPDATE_FAILED
-            }
-
-            if (request.getEmail() != null) {
-                user.setEmail(request.getEmail());
-            }
-            if (request.getFirstName() != null) {
-                user.setFirstName(request.getFirstName());
-            }
-            if (request.getLastName() != null) {
-                user.setLastName(request.getLastName());
-            }
-            if (request.getPhone() != null) {
-                user.setPhone(request.getPhone());
-            }
-            if (request.getAddress() != null) {
-                user.setAddress(request.getAddress());
-            }
-            if (request.getBirthday() != null) {
-                user.setBirthday(request.getBirthday());
-            }
-
-            if (request.getAvatarUrl() != null && !request.getAvatarUrl().isEmpty()) {
-                String avatarUrl = googleDriveService.uploadImageToDrive(request.getAvatarUrl(), FolderType.AVATAR);
-                user.setAvatarUrl(avatarUrl);
-            }
-
-
-            user = userRepository.save(user);
-            return userMapper.toUserResponse(user);
-        } catch (FeignException e) {
-            throw errorNormalizer.handleKeyCloakException(e);
+            userRepository.delete(user);
+            return true;
+        } catch (FeignException exception) {
+            throw errorNormalizer.handleKeyCloakException(exception);
         }
     }
+
+    @Override
+    public Boolean resetPassword(String newPassword) {
+        Long userId = AuthenUtil.getUserId();
+
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
+
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -172,9 +141,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserProfile() {
-        String profileId = AuthenUtil.getProfileId();
+        Long userId = AuthenUtil.getUserId();
 
-        var user = userRepository.findByProfileId(profileId).orElseThrow(
+        var user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.toUserResponse(user);
@@ -194,9 +163,4 @@ public class UserServiceImpl implements UserService {
                 .build());
     }
 
-    private String extractProfileId(ResponseEntity<?> response) {
-        String location = response.getHeaders().get("Location").getFirst();
-        String[] splitedStr = location.split("/");
-        return splitedStr[splitedStr.length - 1];
-    }
 }

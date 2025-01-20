@@ -17,9 +17,4 @@ public class UserUpdateRequest {
     String email;
     String firstName;
     String lastName;
-    String phone;
-    String address;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate birthday;
-    MultipartFile avatarUrl;
 }

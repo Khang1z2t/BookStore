@@ -19,6 +19,10 @@ public interface UserService {
 
     UserResponse updateUser(UserUpdateRequest request);
 
+    Boolean deleteUser(Long userId);
+
+    Boolean resetPassword(String newPassword);
+
     List<UserResponse> getAllUsers();
 
     UserResponse getUserProfile();

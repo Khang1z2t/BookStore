@@ -12,15 +12,10 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    String userId;
-    String profileId;
+    Long id;
     String username;
     String email;
     String firstName;
     String lastName;
-    String phone;
-    String address;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate birthday;
-    String avatarUrl;
+
 }

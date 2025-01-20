@@ -18,37 +18,21 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "userid", nullable = false)
-    private UUID userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "profileid", length = Integer.MAX_VALUE)
-    private String profileId;
-
-    @Size(max = 100)
-    @Column(name = "email", length = 100)
-    private String email;
-
-    @Column(name = "username", length = Integer.MAX_VALUE)
-    private String username;
-
-    @Column(name = "firstname", length = Integer.MAX_VALUE)
+    @Column(name = "firstname", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "lastname", length = Integer.MAX_VALUE)
+    @Column(name = "lastname", nullable = false, length = 50)
     private String lastName;
 
-    @Size(max = 10)
-    @Column(name = "phone", length = 10)
-    private String phone;
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email;
 
-    @Column(name = "address", length = Integer.MAX_VALUE)
-    private String address;
+    @Column(name = "username", nullable = false, unique = true, length = 50)
+    private String username;
 
-    @Column(name = "birthday")
-    private LocalDate birthday;
-
-    @Column(name = "avatar_url", length = Integer.MAX_VALUE)
-    private String avatarUrl;
-
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
 }

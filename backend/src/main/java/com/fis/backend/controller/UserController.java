@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
@@ -40,12 +42,43 @@ public class UserController {
                 .build());
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/update")
     @Operation(summary = "API cập nhật thông tin tài khoản")
-    ResponseEntity<ApiResponse<UserResponse>> updateProfile(@ModelAttribute UserUpdateRequest request) {
+    ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
                 .data(userService.updateUser(request))
                 .build());
     }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "API reset mật khẩu")
+    ResponseEntity<ApiResponse<String>> resetPassword(@RequestParam String newPassword) {
+        try {
+            boolean result = userService.resetPassword(newPassword);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .data(result ? "Cập nhật mật khẩu thành công" : "Cập nhật mật khẩu thất bại")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
+                    .data("Cập nhật mật khẩu thất bại")
+                    .build());
+        }
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    @Operation(summary = "API xóa tài khoản")
+    ResponseEntity<ApiResponse<String>> deleteProfile(@PathVariable Long userId) {
+       try {
+           boolean result = userService.deleteUser(userId);
+           return ResponseEntity.ok(ApiResponse.<String>builder()
+                   .data(result ? "Xóa tài khoản thành công" : "Xóa tài khoản thất bại")
+                   .build());
+       } catch (Exception e) {
+           return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
+                   .data("Xóa tài khoản thất bại")
+                   .build());
+       }
+    }
+
 
 }
