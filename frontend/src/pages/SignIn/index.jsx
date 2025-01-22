@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -16,8 +16,7 @@ import ForgotPassword from '~/components/ForgotPassword';
 import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
 import styles from './SignIn.module.scss';
 import {useAlerts} from "~/context/AlertsContext";
-import {loginUser, test} from "~/services/AuthService";
-import axios from "axios";
+import {loginUser, getUserProfile} from "~/services/UserService";
 
 
 function SignIn({ disableCustomTheme }) {
@@ -29,6 +28,7 @@ function SignIn({ disableCustomTheme }) {
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
     const { showAlert } = useAlerts();
+    const navigate = useNavigate();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -44,13 +44,25 @@ function SignIn({ disableCustomTheme }) {
             try {
                 const response = await loginUser(username, password);
                 showAlert('Login successful', 'success');
-                const token = response.data;
-                console.log('Token:', token);
-                const user = await test(token);
-                console.log('User:', user);
+                const {access_token, refresh_token} = response.data;
+                const token = {access_token, refresh_token};
+                localStorage.setItem('token', JSON.stringify(token));
+                navigate('/profile');
+                // const user = await getUserProfile(token.access_token).data;
             } catch (error) {
-                showAlert(error.response.data.message, 'error');
-                console.error('Login failed:', error.response.data.message);
+                if (error.response) {
+                    // Server responded with a status other than 2xx
+                    showAlert(error.response.data.message, 'error');
+                    console.error('Login failed:', error.response.data.message);
+                } else if (error.request) {
+                    // Request was made but no response received
+                    showAlert('Network error, please try again later', 'error');
+                    console.error('Network error:', error.message);
+                } else {
+                    // Something else happened
+                    showAlert('An unexpected error occurred', 'error');
+                    console.error('Error:', error.message);
+                }
             }
         }
 

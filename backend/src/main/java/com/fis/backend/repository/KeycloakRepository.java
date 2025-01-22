@@ -39,4 +39,10 @@ public interface KeycloakRepository {
             @RequestHeader("authorization") String token,
             @PathVariable("userId") String userId);
 
+    @PostMapping(value = "/realms/bookstore/protocol/openid-connect/token",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    LoginTokenResponse refreshToken(
+            @RequestHeader("Authorization") String token,
+            @QueryMap RefreshTokenParam params);
+
 }

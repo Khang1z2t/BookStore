@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -16,6 +16,8 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
 import styles from './SignUp.module.scss';
+import { registerUser } from '~/services/UserService';
+import {useAlerts} from "~/context/AlertsContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -55,6 +57,13 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 function SignUp({ disableCustomTheme }) {
+    const [register, setRegister] = React.useState({
+        username: '',
+        email: '',
+        firstName: '',
+        lastName: '',
+        password: '',
+    });
     const [usernameError, setUsernameError] = React.useState(false);
     const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
     const [emailError, setEmailError] = React.useState(false);
@@ -65,6 +74,8 @@ function SignUp({ disableCustomTheme }) {
     const [firstNameErrorMessage, setFirstNameErrorMessage] = React.useState('');
     const [lastNameError, setLastNameError] = React.useState(false);
     const [lastNameErrorMessage, setLastNameErrorMessage] = React.useState('');
+    const { showAlert } = useAlerts();
+    const nagivate = useNavigate();
 
     const validateInputs = () => {
         const email = document.getElementById('email');
@@ -123,17 +134,40 @@ function SignUp({ disableCustomTheme }) {
         return isValid;
     };
 
-    const handleSubmit = (event) => {
-        if (firstNameError || lastNameError || usernameError || emailError || passwordError) {
-            event.preventDefault();
-            return;
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setRegister((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (register) {
+            try {
+                console.log(register);
+                const response = await registerUser(register);
+                console.log(response);
+                showAlert('Register Success', 'success');
+                nagivate('/login');
+            } catch (error) {
+                if (error.response) {
+                    // Server responded with a status other than 2xx
+                    showAlert(error.response.data.message, 'error');
+                    console.error('Login failed:', error.response.data.message);
+                } else if (error.request) {
+                    // Request was made but no response received
+                    showAlert('Network error, please try again later', 'error');
+                    console.error('Network error:', error.message);
+                } else {
+                    // Something else happened
+                    showAlert('An unexpected error occurred', 'error');
+                    console.error('Error:', error.message);
+                }
+            }
         }
-        const data = new FormData(event.currentTarget);
-        console.log({
-            lastName: data.get('lastName'),
-            email: data.get('email'),
-            password: data.get('password'),
-        });
     };
 
     return (
@@ -166,6 +200,8 @@ function SignUp({ disableCustomTheme }) {
                                 id="firstName"
                                 placeholder="First name"
                                 error={firstNameError}
+                                value={register.firstName}
+                                onChange={handleInputChange}
                                 helperText={firstNameErrorMessage}
                                 color={firstNameError ? 'error' : 'inherit'}
                             />
@@ -182,6 +218,8 @@ function SignUp({ disableCustomTheme }) {
                                 id="lastName"
                                 placeholder="Last name"
                                 error={lastNameError}
+                                value={register.lastName}
+                                onChange={handleInputChange}
                                 helperText={lastNameErrorMessage}
                                 color={lastNameError ? 'error' : 'inherit'}
                             />
@@ -199,6 +237,8 @@ function SignUp({ disableCustomTheme }) {
                                 autoComplete="username"
                                 variant="outlined"
                                 error={usernameError}
+                                value={register.username}
+                                onChange={handleInputChange}
                                 helperText={usernameErrorMessage}
                                 color={usernameError ? 'error' : 'inherit'}
                             />
@@ -216,6 +256,8 @@ function SignUp({ disableCustomTheme }) {
                                 autoComplete="email"
                                 variant="outlined"
                                 error={emailError}
+                                value={register.email}
+                                onChange={handleInputChange}
                                 helperText={emailErrorMessage}
                                 color={passwordError ? 'error' : 'inherit'}
                             />
@@ -228,12 +270,14 @@ function SignUp({ disableCustomTheme }) {
                                 required
                                 fullWidth
                                 name="password"
-                                placeholder="••••••"
+                                placeholder="********"
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
                                 variant="outlined"
                                 error={passwordError}
+                                value={register.password}
+                                onChange={handleInputChange}
                                 helperText={passwordErrorMessage}
                                 color={passwordError ? 'error' : 'inherit'}
                             />
