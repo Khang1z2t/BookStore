@@ -52,6 +52,30 @@ public class UserServiceImpl implements UserService {
     String clientSecret;
 
     @Override
+    public AuthenticationResponse refreshToken(String refreshToken) {
+        try {
+            var token = keycloakRepository.refreshToken(
+                    "Basic " + AuthenUtil.encodeBasicAuth(clientId, clientSecret),
+                    RefreshTokenParam.builder()
+                            .grant_type("refresh_token")
+                            .refresh_token(refreshToken)
+                            .build());
+            return AuthenticationResponse.builder()
+                    .accessToken(token.getAccessToken())
+                    .expiresIn(token.getExpiresIn())
+                    .refreshExpiresIn(token.getRefreshExpiresIn())
+                    .refreshToken(token.getRefreshToken())
+                    .tokenType(token.getTokenType())
+                    .idToken(token.getIdToken())
+                    .scope(token.getScope())
+                    .build();
+        } catch (FeignException e) {
+            log.error("Error refreshing token: {}", e.getMessage());
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
+    @Override
     @Transactional
     public UserResponse register(RegistrationRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -60,6 +84,10 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        if (request.getPassword() == null) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
 
         User user = userMapper.toUser(request);

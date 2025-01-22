@@ -3,6 +3,7 @@ package com.fis.backend.controller;
 import com.fis.backend.dto.ApiResponse;
 import com.fis.backend.dto.request.LoginRequest;
 import com.fis.backend.dto.request.RegistrationRequest;
+import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
 import com.fis.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/public")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PublicController {
+public class AuthController {
     UserService userService;
 
     @PostMapping("/register")
@@ -34,9 +35,17 @@ public class PublicController {
 
     @PostMapping("/login")
     @Operation(summary = "API đăng nhập")
-    ResponseEntity<ApiResponse<String>> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .data(userService.login(request).getAccessToken())
+    ResponseEntity<ApiResponse<AuthenticationResponse>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(ApiResponse.<AuthenticationResponse>builder()
+                .data(userService.login(request))
+                .build());
+    }
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "API refresh token")
+    ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(@RequestParam String refreshToken) {
+        return ResponseEntity.ok(ApiResponse.<AuthenticationResponse>builder()
+                .data(userService.refreshToken(refreshToken))
                 .build());
     }
 

@@ -13,6 +13,8 @@ import java.util.List;
 
 public interface UserService {
 
+    AuthenticationResponse refreshToken(String refreshToken);
+
     UserResponse register(RegistrationRequest request);
 
     AuthenticationResponse login(LoginRequest request);
