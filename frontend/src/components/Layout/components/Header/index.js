@@ -30,7 +30,7 @@ function Header() {
     const [user, setUser] = React.useState(null);
     const navigate = useNavigate();
     const token = JSON.parse(localStorage.getItem('token'));
-    const { showAlert } = useAlerts();
+    const {showAlert} = useAlerts();
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -94,8 +94,10 @@ function Header() {
                 const response = await getUserProfile(token.access_token);
                 setUser(response.data);
             } catch (error) {
+                localStorage.removeItem('token');
+                setUser(null);
                 navigate('/login');
-                showAlert('error', 'Failed to get user profile, please login again');
+                showAlert('Failed to get user profile, please login again', 'error');
             }
         };
         getUser();
