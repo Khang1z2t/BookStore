@@ -41,3 +41,4 @@ build/
 .env*.local
 
 /src/main/resources/bookstore-446704-e62163826a32.json
+/src/main/resources/bookstore-credentials.json

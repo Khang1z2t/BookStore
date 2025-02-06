@@ -7,11 +7,13 @@ import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
 import com.fis.backend.entity.User;
+import com.fis.backend.entity.UserDetail;
 import com.fis.backend.exception.AppException;
 import com.fis.backend.exception.ErrorCode;
 import com.fis.backend.exception.ErrorNormalizer;
 import com.fis.backend.mapper.UserMapper;
 import com.fis.backend.repository.KeycloakRepository;
+import com.fis.backend.repository.UserDetailRepository;
 import com.fis.backend.repository.UserRepository;
 import com.fis.backend.services.GoogleDriveService;
 import com.fis.backend.services.UserService;
@@ -37,6 +39,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
+    UserDetailRepository userDetailRepository;
     UserMapper userMapper;
     GoogleDriveService googleDriveService;
     KeycloakRepository keycloakRepository;
@@ -96,6 +99,16 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodePassword);
 
         userRepository.save(user);
+
+        userRepository.save(user);
+
+        UserDetail userDetail = new UserDetail();
+        userDetail.setUid(user.getId());
+        userDetailRepository.save(userDetail);
+
+        user.setUserDetail(userDetail);
+        userRepository.save(user);
+
         return userMapper.toUserResponse(user);
     }
 
@@ -173,6 +186,9 @@ public class UserServiceImpl implements UserService {
 
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        var detail = userDetailRepository.findByUid(userId).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHORIZED));
 
         return userMapper.toUserResponse(user);
     }

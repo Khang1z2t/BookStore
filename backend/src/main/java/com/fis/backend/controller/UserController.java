@@ -3,6 +3,8 @@ package com.fis.backend.controller;
 import com.fis.backend.dto.ApiResponse;
 import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.UserResponse;
+import com.fis.backend.entity.User;
+import com.fis.backend.exception.AppException;
 import com.fis.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
@@ -11,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +35,7 @@ public class UserController {
                 .code(200)
                 .data(userService.getAllUsers())
                 .build();
+
     }
 
     @GetMapping("/profile")
@@ -68,16 +72,16 @@ public class UserController {
     @DeleteMapping("/delete/{userId}")
     @Operation(summary = "API xóa tài khoản")
     ResponseEntity<ApiResponse<String>> deleteProfile(@PathVariable Long userId) {
-       try {
-           boolean result = userService.deleteUser(userId);
-           return ResponseEntity.ok(ApiResponse.<String>builder()
-                   .data(result ? "Xóa tài khoản thành công" : "Xóa tài khoản thất bại")
-                   .build());
-       } catch (Exception e) {
-           return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
-                   .data("Xóa tài khoản thất bại")
-                   .build());
-       }
+        try {
+            boolean result = userService.deleteUser(userId);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .data(result ? "Xóa tài khoản thành công" : "Xóa tài khoản thất bại")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
+                    .data("Xóa tài khoản thất bại")
+                    .build());
+        }
     }
 
 

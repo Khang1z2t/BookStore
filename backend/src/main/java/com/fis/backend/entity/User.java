@@ -1,14 +1,11 @@
+// User.java
 package com.fis.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +15,11 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "user_seq")
+    @SequenceGenerator(name = "user_seq",
+            sequenceName = "user_sequence",
+            allocationSize = 1)
     private Long id;
 
     @Column(name = "firstname", nullable = false, length = 50)
@@ -35,4 +36,8 @@ public class User {
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userdetail_id", referencedColumnName = "id")
+    private UserDetail userDetail;
 }

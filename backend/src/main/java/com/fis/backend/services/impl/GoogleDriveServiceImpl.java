@@ -33,7 +33,7 @@ public class GoogleDriveServiceImpl implements GoogleDriveService {
     private Drive getDriveService() throws IOException {
         // Load credentials from JSON file
         GoogleCredentials credentials = GoogleCredentials.fromStream(
-                        getClass().getResourceAsStream("/bookstore-446704-e62163826a32.json"))
+                        getClass().getResourceAsStream("/bookstore-credentials.json"))
                 .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
         return new Drive.Builder(new NetHttpTransport(),
                 JacksonFactory.getDefaultInstance(),
