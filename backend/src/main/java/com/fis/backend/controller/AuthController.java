@@ -49,12 +49,11 @@ public class AuthController {
                 .build());
     }
 
-//    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @Operation(summary = "API tải hình ảnh")
-//    ApiResponse<String> register(@RequestPart(name = "fileImg", required = true) MultipartFile fileImg) throws IOException {
-//        return ApiResponse.<String>builder()
-//                .code(HttpStatus.OK.value())
-//                .data(userService.uploadImage(fileImg))
-//                .build();
-//    }
+    @GetMapping("/check-role")
+    @Operation(summary = "API kiểm tra quyền")
+    ResponseEntity<ApiResponse<String>> checkRole() {
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .data(userService.checkUserRole() ? "admin" : "user")
+                .build());
+    }
 }

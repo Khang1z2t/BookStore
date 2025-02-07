@@ -39,4 +39,56 @@ const getUserProfile = async (token) => {
     return response.data;
 }
 
-export {loginUser, registerUser, getUserProfile, updateUser, refreshToken};
+const getUserRole = async () => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.get('/auth/check-role', {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`
+        }
+    });
+    return response.data;
+}
+
+const getAllUser = async () => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.get('/user/users', {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`
+        }
+    });
+    return response.data;
+}
+
+const exportPdf = async () => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.get('/report/user/export-pdf', {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`
+        },
+        responseType: 'arraybuffer'
+    });
+    return response.data;
+}
+
+const exportExcel = async () => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.get('/report/user/export-excel', {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`
+        },
+        responseType: 'arraybuffer'
+    });
+    return response.data;
+}
+
+export {
+    loginUser,
+    registerUser,
+    getUserProfile,
+    updateUser,
+    refreshToken,
+    getUserRole,
+    getAllUser,
+    exportPdf,
+    exportExcel
+};

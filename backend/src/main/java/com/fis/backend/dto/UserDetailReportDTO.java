@@ -20,13 +20,10 @@ public class UserDetailReportDTO {
     String lastName;
     String email;
     String address;
-//
 //    @JsonProperty("phone_number")
     String phoneNumber;
-//
 //    @JsonProperty("date_of_birth")
     Date dateOfBirth;
-//
 //    @JsonProperty("created_at")
     Instant createdAt;
 }

@@ -25,6 +25,8 @@ public interface UserService {
 
     Boolean resetPassword(String newPassword);
 
+    Boolean checkUserRole();
+
     List<UserResponse> getAllUsers();
 
     UserResponse getUserProfile();

@@ -45,13 +45,13 @@ public class ReportServiceImpl implements ReportService {
 
             return outputStream.toByteArray();
         } catch (JRException e) {
-            log.error("JRException: " + e.getMessage(), e);
+            log.error("JRException: {}", e.getMessage(), e);
             throw e;
         } catch (FileNotFoundException e) {
-            log.error("FileNotFoundException: " + e.getMessage(), e);
+            log.error("FileNotFoundException: {}", e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("Exception: " + e.getMessage(), e);
+            log.error("Exception: {}", e.getMessage(), e);
             throw new UnsupportedOperationException("An unexpected error occurred", e);
         }
     }
@@ -79,13 +79,14 @@ public class ReportServiceImpl implements ReportService {
 
             return outputStream.toByteArray();
         } catch (JRException e) {
-            System.out.println("JRException: " + e.getMessage());
+            log.error("JRException: {}", e.getMessage(), e);
             throw e;
         } catch (FileNotFoundException e) {
-            System.out.println("FileNotFoundException: " + e.getMessage());
+            log.error("FileNotFoundException: {}", e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            throw e;
+            log.error("Exception: {}", e.getMessage(), e);
+            throw new UnsupportedOperationException("An unexpected error occurred", e);
         }
     }
 

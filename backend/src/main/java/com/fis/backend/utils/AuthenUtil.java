@@ -18,4 +18,11 @@ public class AuthenUtil {
         return Base64.getEncoder().encodeToString(credentials.getBytes());
     }
 
+    public static boolean isAdmin() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a
+                        .getAuthority().equals("ADMIN"));
+    }
+
 }

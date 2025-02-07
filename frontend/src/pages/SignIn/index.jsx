@@ -11,7 +11,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import BookIcon from '@mui/icons-material/Book';
-import { Card, SignInContainer } from '~/components/SignIn';
+import { Card, SignInContainer } from '~/components/Signin';
 import ForgotPassword from '~/components/ForgotPassword';
 import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
 import styles from './SignIn.module.scss';

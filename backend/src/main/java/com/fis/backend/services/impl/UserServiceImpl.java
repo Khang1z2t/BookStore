@@ -173,6 +173,11 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Override
+    public Boolean checkUserRole() {
+        return AuthenUtil.isAdmin();
+    }
+
 
     @Override
     public List<UserResponse> getAllUsers() {

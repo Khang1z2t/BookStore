@@ -17,17 +17,18 @@ import AdbIcon from '@mui/icons-material/Adb';
 import SearchIcon from '@mui/icons-material/Search';
 
 import {Search, SearchIconWrapper, StyledInputBase} from '~/components/Layout/components/Search';
-import {getUserProfile} from "~/services/UserService";
+import {getUserProfile, getUserRole} from "~/services/UserService";
 import {refreshUserToken} from "~/services/AuthService";
 import {useAlerts} from "~/context/AlertsContext";
 
 const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Header() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [user, setUser] = React.useState(null);
+    const [role, setRole] = React.useState(null);
+    const [settings, setSettings] = React.useState(['Profile', 'Account', 'Dashboard', 'Logout']);
     const navigate = useNavigate();
     const token = JSON.parse(localStorage.getItem('token'));
     const {showAlert} = useAlerts();
@@ -63,6 +64,9 @@ function Header() {
                 navigate('/');
                 showAlert('Logout successfully', 'success');
                 break;
+            case 'Admin':
+                navigate('/admin');
+                break;
             default:
                 break;
         }
@@ -93,6 +97,11 @@ function Header() {
             try {
                 const response = await getUserProfile(token.access_token);
                 setUser(response.data);
+                const roleResponse = await getUserRole();
+                setRole(roleResponse.data);
+                if (role === 'admin' && !settings.includes('Admin')) {
+                    setSettings(prevSettings => [...prevSettings, 'Admin']);
+                }
             } catch (error) {
                 localStorage.removeItem('token');
                 setUser(null);
@@ -101,7 +110,7 @@ function Header() {
             }
         };
         getUser();
-    }, [navigate, showAlert]);
+    }, [navigate, showAlert, role]);
 
     return (
         <AppBar position="sticky" sx={{backgroundColor: '#000000'}}>
