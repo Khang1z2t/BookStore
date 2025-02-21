@@ -18,7 +18,7 @@ public class SwaggerConfig {
     public OpenAPI customizeOpenAPI() {
         List<Server> servers = new ArrayList<>();
         final String securitySchemeName = "bearerAuth";
-        servers.add(new Server().url("http://localhost:8080"));
+        servers.add(new Server().url("http://localhost:8070"));
 
         return new OpenAPI()
                 .servers(servers)

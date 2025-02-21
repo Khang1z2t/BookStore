@@ -144,6 +144,21 @@
             <artifactId>jasperreports-fonts</artifactId>
             <version>6.21.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm.springboot</groupId>
+            <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+            <version>7.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm.springboot</groupId>
+            <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+            <version>7.22.0</version>
+        </dependency>
 
     </dependencies>
 

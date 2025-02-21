@@ -1,0 +1,65 @@
+server:
+  port: 8070
+
+spring:
+  application:
+    name: backend
+  # Database
+  datasource:
+    url: jdbc:postgresql://localhost:2345/camunda_workflow
+    username: postgres
+    password: 12345
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+  #        default_schema: camunda
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/bookstore
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: admin
+    history-level: full
+    database:
+      type: postgres
+    default-number-of-retries: 1
+    authorization:
+      enabled: true
+#      schema-update: true
+#      schema-name: camunda
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+keycloak:
+  url: http://localhost:8180
+  client-id: bookstore_app
+  client-secret: 17E2yLDr7WusfizjjnAMwvRfFUln7pjD
+  realm: bookstore
+
+service:
+  google:
+    drive:
+      application-name: Bookstore
+      root-folder-id: 1He5J-hyLt2PIBeCqSZ2uiNLr2eOg5E37
+      avatar-folder-id: 1fKZxALBT9OL3nX3X5X0GUl05c6N6HLc4
+      product-folder-id: 1YJv27lKcG7OoMFTiB5Ev7YnK1Cmk30JG

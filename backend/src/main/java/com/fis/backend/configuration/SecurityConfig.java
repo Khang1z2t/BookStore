@@ -23,6 +23,7 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             // -- Api v1
             "/api/v1/**",
+            "/**"
     };
 
     @Bean
