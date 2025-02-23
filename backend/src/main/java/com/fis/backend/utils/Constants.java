@@ -5,4 +5,5 @@ public class Constants {
     public static final String START_PROCESS = "process_order";
     public static final String START_ORDER = "Start_Order";
     public static final String UPDATE_ORDER = "Send_Edit_Request";
+    public static final String RECEIVE_ORDER = "Receive_Order";
 }

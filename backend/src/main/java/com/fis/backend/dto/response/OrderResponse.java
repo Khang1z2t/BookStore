@@ -15,7 +15,7 @@ public class OrderResponse {
     private String id;
     private Long userId;
     private Double totalPrice;
-    private int totalItem;
+    private double totalItem;
     private String orderInfo;
     private String status;
     private List<OrderDetailResponse> orderDetails = new ArrayList<>();

@@ -32,8 +32,13 @@ public class OrderController {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.createOrder(request)));
     }
 
-    @PostMapping("/{id}/update")
+    @PostMapping("/{id}")
     public ResponseEntity<ApiResponse<OrderResponse>> updateOrder(@PathVariable String id, @RequestBody UpdateOrderRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.updateOrder(id, request)));
+    }
+
+    @PostMapping("/{id}/receive")
+    public ResponseEntity<ApiResponse<OrderResponse>> receiveOrder(@PathVariable String id) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.receiveOrder(id)));
     }
 }

@@ -1,5 +1,6 @@
 package com.fis.backend.mapper;
 
+import com.fis.backend.dto.request.OrderDetailRequest;
 import com.fis.backend.dto.response.OrderDetailResponse;
 import com.fis.backend.entity.OrderDetail;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,10 @@ import java.util.List;
 @FieldDefaults(makeFinal = true)
 public class OrderDetailMapper {
     private ModelMapper modelMapper;
+
+    public OrderDetail toOrderDetail(OrderDetailRequest orderDetailRequest) {
+        return modelMapper.map(orderDetailRequest, OrderDetail.class);
+    }
 
     public OrderDetail toOrderDetail(OrderDetailResponse orderDetailResponse) {
         return modelMapper.map(orderDetailResponse, OrderDetail.class);

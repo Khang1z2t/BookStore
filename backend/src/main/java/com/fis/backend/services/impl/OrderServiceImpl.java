@@ -32,6 +32,7 @@ import org.springframework.cloud.logging.LoggingRebinder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -62,43 +63,45 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setStatus(OrderStatus.PENDING.toString());
-
         orderRepository.save(order);
 
-        for (OrderDetailRequest orderDetailRequest : request.getOrderDetails()) {
-            Product product = productRepository.findById(orderDetailRequest.getProductId()).orElse(null);
-
+        for (OrderDetailRequest detailRequest : request.getOrderDetails()) {
+            Product product = productRepository.findById(detailRequest.getProductId()).orElse(null);
             if (product == null) {
-                orderIsValid = false;
+                continue;
             }
 
-            if (orderDetailRequest.getQuantity() > product.getQuantity()) {
+            if (detailRequest.getQuantity() > product.getQuantity()) {
                 orderIsValid = false;
             }
 
             OrderDetail orderDetail = new OrderDetail();
-            double price = product.getPrice() * orderDetailRequest.getQuantity();
-            orderDetail.setPrice(price);
-            orderDetail.setQuantity(orderDetailRequest.getQuantity());
+            double itemPrice = product.getPrice() * detailRequest.getQuantity();
+            orderDetail.setPrice(itemPrice);
             orderDetail.setProduct(product);
+            orderDetail.setQuantity(detailRequest.getQuantity());
             orderDetail.setOrder(order);
             orderDetailRepository.save(orderDetail);
 
-            totalPrice += price;
-            totalProduct += orderDetailRequest.getQuantity();
+            totalPrice += itemPrice;
+            totalProduct += detailRequest.getQuantity();
 
             orderDetailResponses.add(orderDetailMapper.toOrderDetailResponse(orderDetail));
-
         }
-        order.setOrderInfo(request.getOrderInfo());
+
         order.setTotalPrice(totalPrice);
         order.setTotalProduct(totalProduct);
         order.setBusinessKey(processInstance.getBusinessKey());
-        if (!orderIsValid) {
-            order.setStatus(OrderStatus.REQUIRE_UPDATE.toString());
-        }
-        order.setOrderDetails(orderDetailMapper.toOrderDetailList(orderDetailResponses));
         orderRepository.save(order);
+
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setId(order.getId());
+        orderResponse.setTotalPrice(totalPrice);
+        orderResponse.setTotalItem(totalProduct);
+        orderResponse.setOrderInfo(order.getOrderInfo());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setOrderDetails(orderDetailResponses);
+
 
         String businessKey = processInstance.getBusinessKey();
         Task task = taskService.createTaskQuery()
@@ -109,19 +112,19 @@ public class OrderServiceImpl implements OrderService {
         if (task != null) {
             Map<String, Object> variables = new HashMap<>();
             try {
-                String jsonResponse = objectMapper.writeValueAsString(businessKey);
+                String jsonResponse = objectMapper.writeValueAsString(orderResponse);
                 variables.put("orderResponse", jsonResponse);
-
                 variables.put("orderIsValid", orderIsValid);
+
                 taskService.complete(task.getId(), variables);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                log.error("Error processing order task: ", e);
             }
         } else {
-            log.warn("Task not found");
+            log.warn("Do not find task với businessKey: {}", businessKey);
         }
 
-        return orderMapper.toOrderResponse(order);
+        return orderResponse;
     }
 
     @Override
@@ -203,6 +206,30 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
+        return orderMapper.toOrderResponse(order);
+    }
+
+    @Override
+    public OrderResponse receiveOrder(String id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_KEY));
+        order.setStatus(OrderStatus.ACTIVE.toString());
+        orderRepository.save(order);
+
+        String businessKey = order.getBusinessKey();
+        Task task = taskService.createTaskQuery()
+                .processInstanceBusinessKey(businessKey)
+                .taskDefinitionKey(Constants.RECEIVE_ORDER)
+                .singleResult();
+        if (task != null) {
+            Map<String, Object> variables = new HashMap<>();
+            try {
+                variables.put("orderId", order.getId());
+                taskService.complete(task.getId(), variables);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         return orderMapper.toOrderResponse(order);
     }
 }
