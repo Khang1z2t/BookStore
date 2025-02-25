@@ -6,5 +6,6 @@ public enum OrderStatus {
     REQUIRE_UPDATE,
     PENDING,
     COMPLETED,
-    CANCELLED
+    CANCELLED,
+    CONFIRMED
 }

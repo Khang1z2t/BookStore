@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Từ chối đơn hàng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .order-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+
+        h2 {
+            color: #d9534f;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #222;
+        }
+
+        .reason-box {
+            background: #ffe6e6;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #d9534f;
+            font-size: 16px;
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .contact {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .contact a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="order-container">
+    <h2>Thông báo từ chối đơn hàng</h2>
+
+    <p><strong>Khách hàng:</strong> {{username}}</p>
+    <p><strong>Mã đơn hàng:</strong> {{orderID}}</p>
+
+    <div class="reason-box">
+        <p><strong>Lý do từ chối:</strong></p>
+        <p>Đơn hàng đã quá thời gian hoặc không nhận được phản hồi.</p>
+    </div>
+
+    <p>Chúng tôi rất tiếc vì sự bất tiện này. Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi để được hỗ
+        trợ.</p>
+
+    <p class="contact">📞 Hotline: <a href="tel:0865399254">0865399254</a> | ✉️ Email: <a
+            href="mailto:support@toibibel.com">support@toibibel.com</a></p>
+</div>
+</body>
+</html>

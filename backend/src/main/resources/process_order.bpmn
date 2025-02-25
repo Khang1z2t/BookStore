@@ -14,11 +14,11 @@
       <bpmn:incoming>Flow_18pqz9c</bpmn:incoming>
       <bpmn:outgoing>Flow_1xklm7t</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Confirm_Order" name="Xác nhận đơn hàng" camunda:class="com.fis.backend.delegates.order_processing.DelegateAutoSendMail">
+    <bpmn:serviceTask id="Confirm_Order" name="Xác nhận đơn hàng" camunda:class="com.fis.backend.delegates.order_processing.DelegateProcessOrderConfirmation">
       <bpmn:incoming>Flow_1xklm7t</bpmn:incoming>
       <bpmn:outgoing>Flow_0rg0ol4</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Send_Mail_Confirm" name="Gửi mail thông tin đơn hàng" camunda:class="com.fis.backend.delegates.order_processing.DelegateProcessOrderConfirmation">
+    <bpmn:serviceTask id="Send_Mail_Confirm" name="Gửi mail thông tin đơn hàng" camunda:class="com.fis.backend.delegates.order_processing.DelegateSuccessMail">
       <bpmn:incoming>Flow_0rg0ol4</bpmn:incoming>
       <bpmn:outgoing>Flow_1rhli3v</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -31,13 +31,8 @@
       <bpmn:outgoing>Flow_1ga2gb9</bpmn:outgoing>
       <bpmn:outgoing>Flow_0r7rqj2</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:intermediateCatchEvent id="Event_1193a9s">
-      <bpmn:incoming>Flow_1vnuqct</bpmn:incoming>
-      <bpmn:outgoing>Flow_059j42c</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_08y0acw" messageRef="Message_0a5nc8x" />
-    </bpmn:intermediateCatchEvent>
     <bpmn:endEvent id="Event_19upgjx" name="Kết thúc (Timeout)">
-      <bpmn:incoming>Flow_059j42c</bpmn:incoming>
+      <bpmn:incoming>Flow_0vh5wmx</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:exclusiveGateway id="Gateway_1si4l7b" name="Khách hàng đã chỉnh sửa?">
       <bpmn:incoming>Flow_0gaomvc</bpmn:incoming>
@@ -75,12 +70,16 @@
     <bpmn:sequenceFlow id="Flow_0r7rqj2" name="No" sourceRef="Gateway_01kcqoh" targetRef="Send_Edit_Request">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${orderIsValid == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1vnuqct" sourceRef="Event_0eg8gxj" targetRef="Event_1193a9s" />
-    <bpmn:sequenceFlow id="Flow_059j42c" sourceRef="Event_1193a9s" targetRef="Event_19upgjx" />
+    <bpmn:sequenceFlow id="Flow_1vnuqct" sourceRef="Event_0eg8gxj" targetRef="Send_Mail_Fail" />
     <bpmn:sequenceFlow id="Flow_0gaomvc" sourceRef="Send_Edit_Request" targetRef="Gateway_1si4l7b" />
     <bpmn:sequenceFlow id="Flow_1soira3" name="No" sourceRef="Gateway_1si4l7b" targetRef="Event_17fghho">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${customerHasCorrected == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Send_Mail_Fail" name="Gửi mail thông tin đơn hàng" camunda:class="com.fis.backend.delegates.order_processing.DelegateCancelMail">
+      <bpmn:incoming>Flow_1vnuqct</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vh5wmx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0vh5wmx" sourceRef="Send_Mail_Fail" targetRef="Event_19upgjx" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process_order">
@@ -114,15 +113,6 @@
           <dc:Bounds x="410" y="165" width="81" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1q8lytd" bpmnElement="Event_1193a9s" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
-        <dc:Bounds x="692" y="82" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_19upgjx_di" bpmnElement="Event_19upgjx" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
-        <dc:Bounds x="782" y="82" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="772" y="125" width="47" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1si4l7b_di" bpmnElement="Gateway_1si4l7b" isMarkerVisible="true" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
         <dc:Bounds x="425" y="445" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -140,6 +130,15 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0uwcu2k_di" bpmnElement="Start_Process" bioc:stroke="#6b3c00" bioc:fill="#ffe0b2" color:background-color="#ffe0b2" color:border-color="#6b3c00">
         <dc:Bounds x="212" y="332" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_04vywuc" bpmnElement="Send_Mail_Fail" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="690" y="40" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19upgjx_di" bpmnElement="Event_19upgjx" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="872" y="62" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="862" y="105" width="47" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_121f2hq_di" bpmnElement="Event_0eg8gxj" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
         <dc:Bounds x="622" y="162" width="36" height="36" />
@@ -193,12 +192,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1vnuqct_di" bpmnElement="Flow_1vnuqct">
         <di:waypoint x="640" y="162" />
-        <di:waypoint x="640" y="100" />
-        <di:waypoint x="692" y="100" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_059j42c_di" bpmnElement="Flow_059j42c">
-        <di:waypoint x="728" y="100" />
-        <di:waypoint x="782" y="100" />
+        <di:waypoint x="640" y="80" />
+        <di:waypoint x="690" y="80" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0gaomvc_di" bpmnElement="Flow_0gaomvc">
         <di:waypoint x="450" y="390" />
@@ -210,6 +205,10 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="483" y="442" width="15" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vh5wmx_di" bpmnElement="Flow_0vh5wmx">
+        <di:waypoint x="790" y="80" />
+        <di:waypoint x="872" y="80" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

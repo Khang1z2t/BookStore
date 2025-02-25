@@ -25,4 +25,20 @@ public class GenaratedId {
 
         return sb.toString();
     }
+
+    public String maskName(String name) {
+        if (name == null || name.length() < 2) {
+            return name; // Nếu tên quá ngắn, giữ nguyên
+        }
+
+        // Lấy chữ cái đầu và cuối
+        char firstChar = name.charAt(0);
+        char lastChar = name.charAt(name.length() - 1);
+
+        // Tạo phần giữa thành ***
+        String maskedPart = "*".repeat(name.length() - 2);
+
+        return firstChar + maskedPart + lastChar;
+    }
+
 }

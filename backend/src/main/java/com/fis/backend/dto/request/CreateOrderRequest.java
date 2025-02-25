@@ -14,6 +14,5 @@ import java.util.List;
 public class CreateOrderRequest {
 
     private Long userId;
-    private String orderInfo;
     private List<OrderDetailRequest> orderDetails;
 }

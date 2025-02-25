@@ -21,6 +21,7 @@ import com.fis.backend.repository.ProductRepository;
 import com.fis.backend.services.OrderService;
 import com.fis.backend.services.UserService;
 import com.fis.backend.utils.Constants;
+import com.fis.backend.utils.GenaratedId;
 import com.fis.backend.utils.enums.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.camunda.bpm.admin.impl.plugin.resources.MetricsRestService.objectMapper;
@@ -49,12 +51,23 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderDetailMapper orderDetailMapper;
     private final OrderMapper orderMapper;
+    private final GenaratedId genaratedId;
     private final LoggingRebinder loggingRebinder;
+
+    private String generatorOrderNO(String lastOrderId) {
+        String datePart = new SimpleDateFormat("ddMMyy").format(new Date());
+        if (lastOrderId == null) {
+            return genaratedId.createNewID("OD" + datePart);
+        } else {
+            return genaratedId.createIDFromLastID("OD" + datePart, 10, lastOrderId);
+        }
+    }
 
     @Override
     public OrderResponse createOrder(CreateOrderRequest request) {
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey(Constants.START_PROCESS, UUID.randomUUID().toString());
+        Order lastOrderNo = orderRepository.findFirstByOrderByOrderInfoDesc();
 
         double totalPrice = 0;
         double totalProduct = 0;
@@ -92,6 +105,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(totalPrice);
         order.setTotalProduct(totalProduct);
         order.setBusinessKey(processInstance.getBusinessKey());
+        order.setOrderInfo(generatorOrderNO(lastOrderNo.getOrderInfo()));
         orderRepository.save(order);
 
         OrderResponse orderResponse = new OrderResponse();
