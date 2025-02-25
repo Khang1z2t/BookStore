@@ -32,6 +32,19 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: pacific.musketeers.tni@gmail.com
+    password: gouglwaehnjnrhim
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 camunda:
   bpm:
     admin-user:
