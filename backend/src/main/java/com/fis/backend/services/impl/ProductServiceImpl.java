@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        List<Product> products = productRepository.findAllByOrderByCreatedAtDesc();
         return products.stream().map(product -> modelMapper.map(product, ProductResponse.class)).toList();
     }
 }

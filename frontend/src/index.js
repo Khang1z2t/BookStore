@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './tailwind.css'
 import reportWebVitals from './reportWebVitals';
 import GlobalStyles from "~/components/GlobalStyle";
 import keycloak from "./keycloak";
