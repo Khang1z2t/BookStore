@@ -3,6 +3,7 @@ package com.fis.backend.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -10,14 +11,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductRequest {
-    @Schema(description = "Tên sản phẩm", example = "Hồi kí Yuno")
+    @Schema(description = "Tên sản phẩm", example = "Oshi no ko Vol")
     String name;
-    @Schema(description = "Mô tả sản phẩm", example = "Hồi kí của Yuno")
+    @Schema(description = "Mô tả sản phẩm", example = "Ai is very kawaii")
     String description;
     @Schema(description = "Giá sản phẩm", example = "100000")
     Double price;
-    @Schema(description = "Link ảnh sản phẩm", example = "https://www.google.com")
-    String imageUrl;
     @Schema(description = "Số lượng sản phẩm", example = "100")
     Integer quantity;
 }

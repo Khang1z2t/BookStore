@@ -3,14 +3,18 @@ package com.fis.backend.services.impl;
 import com.fis.backend.dto.request.ProductRequest;
 import com.fis.backend.dto.response.ProductResponse;
 import com.fis.backend.entity.Product;
+import com.fis.backend.mapper.ProductMapper;
 import com.fis.backend.repository.ProductRepository;
+import com.fis.backend.services.GoogleDriveService;
 import com.fis.backend.services.ProductService;
 import com.fis.backend.utils.GenaratedId;
+import com.fis.backend.utils.enums.FolderType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,17 +25,22 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     GenaratedId genaratedId;
     ModelMapper modelMapper;
+    ProductMapper productMapper;
+    GoogleDriveService googleDriveService;
 
     @Override
-    public ProductResponse addProduct(ProductRequest request) {
-        Product product = modelMapper.map(request, Product.class);
+    public ProductResponse addProduct(ProductRequest request, MultipartFile file) {
+        Product product = productMapper.toProduct(request);
         Product lastPlant = productRepository.findFirstByOrderByIdDesc();
         if (lastPlant == null) {
             product.setId(genaratedId.createNewID("PD"));
         } else {
             product.setId(genaratedId.createIDFromLastID("PD", 2, lastPlant.getId()));
         }
-        return modelMapper.map(productRepository.save(product), ProductResponse.class);
+        product.setImageUrl(genaratedId.getIdImage(
+                googleDriveService.uploadImageToDrive(file, FolderType.PRODUCT)));
+        product = productRepository.save(product);
+        return productMapper.toProductResponse(product);
     }
 
     @Override

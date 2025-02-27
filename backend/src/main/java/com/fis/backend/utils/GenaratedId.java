@@ -3,6 +3,9 @@ package com.fis.backend.utils;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Component
 public class GenaratedId {
     public String createNewID(String chars) {
@@ -39,6 +42,15 @@ public class GenaratedId {
         String maskedPart = "*".repeat(name.length() - 2);
 
         return firstChar + maskedPart + lastChar;
+    }
+
+    public String getIdImage(String url) {
+        Pattern pattern = Pattern.compile("/d/([^/]+)");
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return url;
     }
 
 }

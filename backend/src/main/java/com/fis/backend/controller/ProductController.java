@@ -6,11 +6,10 @@ import com.fis.backend.dto.response.ProductResponse;
 import com.fis.backend.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -19,8 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
     ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponse>> addProduct(@RequestBody ProductRequest request) {
-        return ResponseEntity.ok(new ApiResponse<>(200, "", productService.addProduct(request)));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<ProductResponse>> addProduct(@ModelAttribute ProductRequest request,
+                                                                   @RequestPart MultipartFile file) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", productService.addProduct(request, file)));
     }
 }

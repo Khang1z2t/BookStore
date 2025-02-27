@@ -6,7 +6,7 @@ spring:
     name: backend
   # Database
   datasource:
-    url: jdbc:postgresql://localhost:2345/camunda_workflow
+    url: jdbc:postgresql://localhost:2345/provider_db
     username: postgres
     password: 12345
 

@@ -11,6 +11,7 @@ import com.fis.backend.dto.response.OrderResponse;
 import com.fis.backend.entity.Order;
 import com.fis.backend.entity.OrderDetail;
 import com.fis.backend.entity.Product;
+import com.fis.backend.entity.User;
 import com.fis.backend.exception.AppException;
 import com.fis.backend.exception.ErrorCode;
 import com.fis.backend.mapper.OrderDetailMapper;
@@ -18,8 +19,10 @@ import com.fis.backend.mapper.OrderMapper;
 import com.fis.backend.repository.OrderDetailRepository;
 import com.fis.backend.repository.OrderRepository;
 import com.fis.backend.repository.ProductRepository;
+import com.fis.backend.repository.UserRepository;
 import com.fis.backend.services.OrderService;
 import com.fis.backend.services.UserService;
+import com.fis.backend.utils.AuthenUtil;
 import com.fis.backend.utils.Constants;
 import com.fis.backend.utils.GenaratedId;
 import com.fis.backend.utils.enums.OrderStatus;
@@ -53,6 +56,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final GenaratedId genaratedId;
     private final LoggingRebinder loggingRebinder;
+    private final UserRepository userRepository;
 
     private String generatorOrderNO(String lastOrderId) {
         String datePart = new SimpleDateFormat("ddMMyy").format(new Date());
@@ -67,6 +71,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse createOrder(CreateOrderRequest request) {
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey(Constants.START_PROCESS, UUID.randomUUID().toString());
+        User user = userRepository.findById(AuthenUtil.getUserId()).orElse(null);
         Order lastOrderNo = orderRepository.findFirstByOrderByOrderInfoDesc();
 
         double totalPrice = 0;
@@ -76,6 +81,8 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setStatus(OrderStatus.PENDING.toString());
+        order.setUser(user);
+        order.setOrderInfo(generatorOrderNO(lastOrderNo.getOrderInfo() != null ? lastOrderNo.getOrderInfo() : null));
         orderRepository.save(order);
 
         for (OrderDetailRequest detailRequest : request.getOrderDetails()) {
@@ -105,7 +112,6 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(totalPrice);
         order.setTotalProduct(totalProduct);
         order.setBusinessKey(processInstance.getBusinessKey());
-        order.setOrderInfo(generatorOrderNO(lastOrderNo.getOrderInfo()));
         orderRepository.save(order);
 
         OrderResponse orderResponse = new OrderResponse();
@@ -115,6 +121,7 @@ public class OrderServiceImpl implements OrderService {
         orderResponse.setOrderInfo(order.getOrderInfo());
         orderResponse.setStatus(order.getStatus());
         orderResponse.setOrderDetails(orderDetailResponses);
+        orderResponse.setUserId(order.getUser().getId());
 
 
         String businessKey = processInstance.getBusinessKey();

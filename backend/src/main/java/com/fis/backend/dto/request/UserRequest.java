@@ -18,12 +18,12 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequest {
     @Size(min = 4, message = "INVALID_USERNAME")
-    @Schema(description = "Tên đăng nhập", example = "user123")
+    @Schema(description = "Tên đăng nhập", example = "khang")
     String username;
 
     @Size(min = 6, message = "INVALID_PASSWORD")
     @JsonProperty(value = "password", required = true)
-    @Schema(description = "Mật khẩu của tài khoản", example = "password123")
+    @Schema(description = "Mật khẩu của tài khoản", example = "12345678")
     String password;
     String email;
     String firstName;
