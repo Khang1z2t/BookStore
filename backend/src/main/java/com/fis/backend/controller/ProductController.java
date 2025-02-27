@@ -11,12 +11,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/product")
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ProductController {
     ProductService productService;
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getAll() {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", productService.getAllProducts()));
+    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProductResponse>> addProduct(@ModelAttribute ProductRequest request,
