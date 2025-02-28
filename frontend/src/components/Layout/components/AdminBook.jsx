@@ -1,8 +1,10 @@
-import {Alert, Button, Card, Spin, Table, Typography} from "antd";
+import {Alert, Button, Card, Form, Modal, Spin, Table, Typography} from "antd";
 import {useEffect, useState} from "react";
 import {useAlerts} from "~/context/AlertsContext";
 import {getAllProduct} from "~/services/ProductService";
 import GoogleImage from "~/components/GoogleImage";
+import {LoadingOutlined} from "@ant-design/icons";
+import ProductInput from "~/components/AdminInput/ProductInput";
 
 const {Title} = Typography;
 
@@ -11,7 +13,8 @@ function AdminBook() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const {showAlert} = useAlerts();
-
+    const [visible, setVisible] = useState(false);
+    const [form] = Form.useForm();
     const columns = [
         {
             title: 'STT',
@@ -54,7 +57,7 @@ function AdminBook() {
             title: 'Hình ảnh',
             dataIndex: 'imageUrl',
             key: 'imageUrl',
-            render: (text) => <GoogleImage width={100} imageId={text} /> || 'Chưa có',
+            render: (text) => <GoogleImage width={100} imageId={text}/> || 'Chưa có',
         },
         {
             title: 'Ngày tham gia',
@@ -87,6 +90,13 @@ function AdminBook() {
 
     }
 
+    const handleFinish = (values) => {
+        console.log('Form values:', values);
+        // Gọi API thêm người dùng ở đây
+        setVisible(false);
+        form.resetFields();
+    };
+
     return (
         <Card
             style={{
@@ -98,28 +108,48 @@ function AdminBook() {
                 Danh Sách Sản Phẩm
             </Title>
 
-            <div style={{marginBottom: 16}}>
-                <Button
-                    type="primary"
-                    style={{marginRight: 8}}
-                    onClick={exportToExcel}
-                >
-                    Export Excel
+            <div className={"mb-4 flex justify-between items-center"}>
+                <div>
+                    <Button
+                        color="cyan" variant="outlined"
+                        style={{marginRight: 8}}
+                        onClick={exportToExcel}
+                    >
+                        Export Excel
+                    </Button>
+                    <Button
+                        color="danger" variant="outlined"
+                        onClick={exportToPDF}
+                    >
+                        Export PDF
+                    </Button>
+                </div>
+                <Button color="default"
+                        variant="solid"
+                        onClick={() => setVisible(true)}>
+                    Add
                 </Button>
-                <Button
-                    style={{
-                        backgroundColor: '#ff4d4f',
-                        color: '#fff',
-                        border: 'none',
-                        marginRight: 8,
-                    }}
-                    onClick={exportToPDF}
-                >
-                    Export PDF
-                </Button>
+                <Modal
+                    title={"Thên sản phẩm"}
+                    centered
+                    open={visible}
+                    onOk={() => form.submit()}
+                    onCancel={() => setVisible(false)}
+                    okText={"Thêm"}
+                    cancelText={"Hủy"}
+                    width={{
+                        xs: '90%',
+                        sm: '80%',
+                        md: '70%',
+                        lg: '60%',
+                        xl: '50%',
+                        xxl: '40%',
+                    }}>
+                    <ProductInput form={form} onFinish={handleFinish}/>
+                </Modal>
             </div>
 
-            {loading && <Spin/>}
+            {loading && <LoadingOutlined/>}
             {error && <Alert message={error} type="error" showIcon/>}
 
             {!loading && !error && (

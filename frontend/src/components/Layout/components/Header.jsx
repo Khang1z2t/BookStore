@@ -20,6 +20,7 @@ import {Search, SearchIconWrapper, StyledInputBase} from '~/components/Layout/co
 import {getUserProfile, getUserRole} from "~/services/UserService";
 import {refreshUserToken} from "~/services/AuthService";
 import {useAlerts} from "~/context/AlertsContext";
+import {ShoppingCartIcon} from "lucide-react";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
@@ -109,7 +110,7 @@ function Header() {
                 showAlert('Failed to get user profile, please login again', 'error');
             }
         };
-        getUser();
+        getUser().then(r => r);
     }, [navigate, showAlert, role]);
 
     return (
@@ -207,35 +208,42 @@ function Header() {
                     </Search>
 
                     {user ? (
-                        <Box sx={{flexGrow: 0}}>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                    <Avatar alt={user.username} src="/static/images/avatar/2.jpg"/>
+                        <>
+                            <Box className={'mr-3'}>
+                                <IconButton component={Link} to="/cart" color="inherit">
+                                    <ShoppingCartIcon size={24}/>
                                 </IconButton>
-                            </Tooltip>
-                            <Menu
-                                sx={{mt: '45px'}}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
-                            >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
-                                        <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
-                        </Box>
+                            </Box>
+                            <Box sx={{flexGrow: 0}}>
+                                <Tooltip title="Open settings">
+                                    <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                        <Avatar alt={user.username} src="/static/images/avatar/2.jpg"/>
+                                    </IconButton>
+                                </Tooltip>
+                                <Menu
+                                    sx={{mt: '45px'}}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                >
+                                    {settings.map((setting) => (
+                                        <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
+                                            <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+                        </>
                     ) : (
                         <Box><AuthBtn/></Box>
                     )}

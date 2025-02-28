@@ -1,6 +1,5 @@
 import {getUserProfile, refreshToken} from "~/services/UserService";
 import {jwtDecode} from "jwt-decode";
-import {useNavigate} from "react-router-dom";
 
 const getUser = () => {
     const token = JSON.parse(localStorage.getItem('token'));

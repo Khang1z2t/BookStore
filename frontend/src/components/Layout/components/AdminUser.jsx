@@ -1,16 +1,20 @@
 import {useEffect, useState} from "react";
 import {useAlerts} from "~/context/AlertsContext";
 
-import { Table, Button, Typography, Spin, Alert, Card } from 'antd';
+import {Table, Button, Typography, Spin, Alert, Card, Modal, Form, Input} from 'antd';
 import {exportExcel, exportPdf, getAllUser} from "~/services/UserService";
+import {LoadingOutlined, UploadOutlined} from "@ant-design/icons";
+import UserInput from "~/components/AdminInput/UserInput";
 
-const { Title } = Typography;
+const {Title} = Typography;
 
 function AdminUser() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const {showAlert} = useAlerts();
+    const [visible, setVisible] = useState(false);
+    const [form] = Form.useForm();
     const columns = [
         {
             title: 'STT',
@@ -120,6 +124,14 @@ function AdminUser() {
         }
     };
 
+    const handleFinish = (values) => {
+        console.log('Form values:', values);
+        // Gọi API thêm người dùng ở đây
+        setVisible(false);
+        form.resetFields();
+    };
+
+
     return (
         <Card
             style={{
@@ -127,40 +139,60 @@ function AdminUser() {
                 borderRadius: 8,
             }}
         >
-            <Title level={4} style={{ marginBottom: 16 }}>
+            <Title level={4} style={{marginBottom: 16}}>
                 Danh Sách Người Dùng
             </Title>
 
-            <div style={{ marginBottom: 16 }}>
-                <Button
-                    type="primary"
-                    style={{ marginRight: 8 }}
-                    onClick={exportToExcel}
-                >
-                    Export Excel
+            <div className={"mb-4 flex justify-between items-center"}>
+                <div>
+                    <Button
+                        color="cyan" variant="outlined"
+                        style={{marginRight: 8}}
+                        onClick={exportToExcel}
+                    >
+                        Export Excel
+                    </Button>
+                    <Button
+                        color="danger" variant="outlined"
+                        onClick={exportToPDF}
+                    >
+                        Export PDF
+                    </Button>
+                </div>
+                <Button color="default"
+                        variant="solid"
+                        onClick={() => setVisible(true)}>
+                    Add
                 </Button>
-                <Button
-                    style={{
-                        backgroundColor: '#ff4d4f',
-                        color: '#fff',
-                        border: 'none',
-                        marginRight: 8,
-                    }}
-                    onClick={exportToPDF}
-                >
-                    Export PDF
-                </Button>
+                <Modal
+                    title={"Thêm người dùng"}
+                    centered
+                    open={visible}
+                    onOk={() => form.submit()}
+                    onCancel={() => setVisible(false)}
+                    okText={"Thêm"}
+                    cancelText={"Hủy"}
+                    width={{
+                        xs: '90%',
+                        sm: '80%',
+                        md: '70%',
+                        lg: '60%',
+                        xl: '50%',
+                        xxl: '40%',
+                    }}>
+                    <UserInput form={form} onFinish={handleFinish}/>
+                </Modal>
             </div>
 
-            {loading && <Spin />}
-            {error && <Alert message={error} type="error" showIcon />}
+            {loading && <LoadingOutlined/>}
+            {error && <Alert message={error} type="error" showIcon/>}
 
             {!loading && !error && (
                 <Table
                     columns={columns}
                     dataSource={users}
                     rowKey="id"
-                    pagination={{ pageSize: 10 }}
+                    pagination={{pageSize: 10}}
                 />
             )}
         </Card>
