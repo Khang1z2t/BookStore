@@ -3,7 +3,7 @@ import {Button, Card} from "antd";
 const {Meta} = Card;
 
 
-function BookCard({book, onBuy, onAddToCart, onClick}) {
+function BookCard({book, onBuy, onAddToCart, bookDetail}) {
     const bookDefault = {
         id: book.id || '',
         name: book.name || '',
@@ -23,7 +23,7 @@ function BookCard({book, onBuy, onAddToCart, onClick}) {
                     className={'object-fill w-auto h-[200px]'}
                 />
             }
-            onClick={() => onClick(bookDefault.id)}
+            // onClick={() => bookDetail(bookDefault.id)}
             style={{ marginBottom: '16px', minHeight: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
         >
             <Meta

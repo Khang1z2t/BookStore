@@ -21,6 +21,7 @@ import {getUserProfile, getUserRole} from "~/services/UserService";
 import {refreshUserToken} from "~/services/AuthService";
 import {useAlerts} from "~/context/AlertsContext";
 import {ShoppingCartIcon} from "lucide-react";
+import CardButton from "~/components/Layout/components/CardButton";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
@@ -209,11 +210,7 @@ function Header() {
 
                     {user ? (
                         <>
-                            <Box className={'mr-3'}>
-                                <IconButton component={Link} to="/cart" color="inherit">
-                                    <ShoppingCartIcon size={24}/>
-                                </IconButton>
-                            </Box>
+                            <CardButton/>
                             <Box sx={{flexGrow: 0}}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>

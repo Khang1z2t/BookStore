@@ -5,6 +5,7 @@ import Profile from "~/pages/Profile";
 import EditProfile from "~/pages/EditProfile";
 import AdminPage from "~/pages/AdminPage";
 import NoLayout from "~/components/Layout/NoLayout";
+import CartPage from "~/pages/CartPage";
 
 const publicRoutes = [
     {path: '/', component: Home},
@@ -12,7 +13,7 @@ const publicRoutes = [
     {path: '/register', component: SignUp},
     {path: '/profile', component: Profile},
     {path: '/edit-profile', component: EditProfile},
-    {path: '/cart', component: () => <div>Cart</div>},
+    {path: '/cart', component: CartPage},
     {path: '/admin', component: AdminPage, layout: NoLayout},
 ]
 
