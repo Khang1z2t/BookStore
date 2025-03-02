@@ -30,4 +30,9 @@ public class ProductController {
                                                                    @RequestPart MultipartFile file) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", productService.addProduct(request, file)));
     }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable String id) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", productService.getProductById(id)));
+    }
 }

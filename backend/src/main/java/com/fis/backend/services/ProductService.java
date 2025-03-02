@@ -15,7 +15,7 @@ public interface ProductService {
 
     Boolean deleteProduct(Long productId);
 
-    ProductResponse getProduct(Long productId);
+    ProductResponse getProduct(String productId);
 
     ProductResponse getProductByName(String productName);
 

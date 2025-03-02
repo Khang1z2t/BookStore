@@ -61,8 +61,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProduct(Long productId) {
-        return null;
+    public ProductResponse getProduct(String productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        return modelMapper.map(product, ProductResponse.class);
     }
 
     @Override
