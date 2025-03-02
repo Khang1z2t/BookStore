@@ -55,7 +55,7 @@ function Home() {
 
 
     return (
-        <Box className={'mt-2'}>
+        <Box className={'mt-2 overflow-hidden'}>
             <BookList books={books}/>
         </Box>
     );
