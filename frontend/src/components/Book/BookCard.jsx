@@ -19,9 +19,8 @@ function BookCard({book, onBuy, onAddToCart, onClick}) {
             cover={
                 <img
                     alt={bookDefault.name}
-                    src={`https://drive.google.com/thumbnail?id=${bookDefault.image}`}
-                    style={{height: '200px', objectFit: 'fill'}}
-
+                    src={`https://lh3.googleusercontent.com/d/${bookDefault.image}`}
+                    className={'object-fill w-auto h-[200px]'}
                 />
             }
             onClick={() => onClick(bookDefault.id)}
