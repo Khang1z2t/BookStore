@@ -6,6 +6,7 @@ import EditProfile from "~/pages/EditProfile";
 import AdminPage from "~/pages/AdminPage";
 import NoLayout from "~/components/Layout/NoLayout";
 import CartPage from "~/pages/CartPage";
+import NotFoundPage from "~/pages/NotFoundPage";
 
 const publicRoutes = [
     {path: '/', component: Home},
@@ -14,9 +15,11 @@ const publicRoutes = [
     {path: '/profile', component: Profile},
     {path: '/edit-profile', component: EditProfile},
     {path: '/cart', component: CartPage},
-    {path: '/admin', component: AdminPage, layout: NoLayout},
+    {path: '/not-found', component: NotFoundPage}
 ]
 
-const privateRoutes = []
+const privateRoutes = [
+    {path: '/admin', component: AdminPage, layout: NoLayout},
+]
 
 export {publicRoutes, privateRoutes};

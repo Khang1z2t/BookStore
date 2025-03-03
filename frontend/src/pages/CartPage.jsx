@@ -3,6 +3,8 @@ import {Button, Card, Row, Col, Typography, message, InputNumber, Table, Image, 
 import {UserOutlined, PercentageOutlined, GiftOutlined, LoadingOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {findProductById} from "~/services/ProductService";
+import {createOrder} from "~/services/OrderService";
+import {useAlerts} from "~/context/AlertsContext";
 
 
 const {Title, Text} = Typography;
@@ -11,6 +13,7 @@ function CartPage() {
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(true);
     const [totalPrice, setTotalPrice] = useState(0);
+    const {showAlert} = useAlerts();
     const columns = [
         {
             title: "Hình ảnh",
@@ -73,7 +76,6 @@ function CartPage() {
                 const updatedCart = await Promise.all(
                     storedCart.map(async (item) => {
                         const product = await fetchProductById(item.id);
-                        console.log(product);
                         return product ? {...product, quantity: item.quantity} : null;
                     })
                 );
@@ -115,11 +117,37 @@ function CartPage() {
         setTotalPrice(total);
     };
 
+    const handleOrder = async () => {
+        setLoading(true);
+
+        const orderPayload = {
+            orderDetails: cart.map(({id, quantity}) => ({
+                productId: id,
+                quantity
+            }))
+        };
+        console.log("orderPayload", orderPayload);
+        try {
+            const response = await createOrder(orderPayload);
+
+            if (response) {
+                message.success("Đã xác nhận đơn hàng!").then(r => r);
+                localStorage.removeItem("cart");
+                setCart([]);
+            }
+        } catch (error) {
+            message.error("Đã xảy ra lỗi khi xác nhận đơn hàng!").then(r => r);
+        } finally {
+            setLoading(false);
+            showAlert("Đã xác nhận đơn hàng!", "success");
+        }
+    }
+
     return (
         <div className="container mx-auto p-6">
             {loading ? (
                 <div className="flex justify-center items-center h-[400px]">
-                    <Spin indicator={<LoadingOutlined spin/>} size="large"/>
+                    <Spin indicator={<LoadingOutlined className={'text-black'} spin/>} size="large"/>
                 </div>
             ) : cart.length === 0 ? (
                 <Card className="bg-gray-50 p-10 rounded-lg">
@@ -211,7 +239,9 @@ function CartPage() {
                                 </Row>
                                 <div className="mt-6 text-right">
                                     <Title level={4}>Tổng tiền: {totalPrice.toLocaleString("vi-VN")} đ</Title>
-                                    <Button type="primary" className="mt-4 w-full">Xác nhận thanh toán</Button>
+                                    <Button color="default" variant="solid" className="mt-4 w-full"
+                                            onClick={handleOrder}>Xác nhận thanh
+                                        toán</Button>
                                 </div>
                             </Card>
                         </Col>

@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {useAlerts} from "~/context/AlertsContext";
 import {getAllProduct} from "~/services/ProductService";
 import GoogleImage from "~/components/GoogleImage";
-import {LoadingOutlined} from "@ant-design/icons";
+import {LoadingOutlined, ReloadOutlined} from "@ant-design/icons";
 import ProductInput from "~/components/AdminInput/ProductInput";
 
 const {Title} = Typography;
@@ -11,6 +11,7 @@ const {Title} = Typography;
 function AdminBook() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(false);
     const [error, setError] = useState(null);
     const {showAlert} = useAlerts();
     const [visible, setVisible] = useState(false);
@@ -68,22 +69,25 @@ function AdminBook() {
         },
     ]
 
-    useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                const response = await getAllProduct();
-                setProducts(response.data)
-            } catch (error) {
-                showAlert(error.message, 'error');
-            } finally {
-                setLoading(false);
-            }
+    const fetchProduct = async () => {
+        setTableLoading(true)
+        try {
+            const response = await getAllProduct();
+            setProducts(response.data)
+        } catch (error) {
+            showAlert(error.message, 'error');
+        } finally {
+            setLoading(false);
+            setTableLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchProduct().then(r => r)
     }, []);
 
     const exportToPDF = async () => {
-
+        showAlert('test')
     }
 
     const exportToExcel = async () => {
@@ -104,9 +108,20 @@ function AdminBook() {
                 borderRadius: 8,
             }}
         >
-            <Title level={4} style={{marginBottom: 16}}>
-                Danh Sách Sản Phẩm
-            </Title>
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                <Title level={4} style={{marginBottom: 16}}>
+                    Danh Sách Sản phẩm
+                </Title>
+                {/* Nút làm mới */}
+                <Button
+                    icon={<ReloadOutlined/>}
+                    loading={tableLoading}
+                    onClick={fetchProduct}
+                    color={'default'}
+                    variant={'text'}
+                >
+                </Button>
+            </div>
 
             <div className={"mb-4 flex justify-between items-center"}>
                 <div>

@@ -3,7 +3,7 @@ import {useAlerts} from "~/context/AlertsContext";
 
 import {Table, Button, Typography, Spin, Alert, Card, Modal, Form, Input} from 'antd';
 import {exportExcel, exportPdf, getAllUser} from "~/services/UserService";
-import {LoadingOutlined, UploadOutlined} from "@ant-design/icons";
+import {LoadingOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
 import UserInput from "~/components/AdminInput/UserInput";
 
 const {Title} = Typography;
@@ -11,6 +11,7 @@ const {Title} = Typography;
 function AdminUser() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(false);
     const [error, setError] = useState(null);
     const {showAlert} = useAlerts();
     const [visible, setVisible] = useState(false);
@@ -75,18 +76,21 @@ function AdminUser() {
         },
     ];
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await getAllUser();
-                setUsers(response.data);
-            } catch (error) {
-                showAlert(error.message, 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchUsers = async () => {
+        setTableLoading(true)
+        try {
+            const response = await getAllUser();
+            setUsers(response.data);
+        } catch (error) {
+            showAlert(error.message, 'error');
+        } finally {
+            setLoading(false);
+            setTableLoading(false);
+        }
+    };
 
+
+    useEffect(() => {
         fetchUsers().then(r => r);
     }, []);
 
@@ -139,9 +143,20 @@ function AdminUser() {
                 borderRadius: 8,
             }}
         >
-            <Title level={4} style={{marginBottom: 16}}>
-                Danh Sách Người Dùng
-            </Title>
+            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                <Title level={4} style={{marginBottom: 16}}>
+                    Danh Sách Người dùng
+                </Title>
+                {/* Nút làm mới */}
+                <Button
+                    icon={<ReloadOutlined/>}
+                    loading={tableLoading}
+                    onClick={fetchUsers}
+                    color={'default'}
+                    variant={'text'}
+                >
+                </Button>
+            </div>
 
             <div className={"mb-4 flex justify-between items-center"}>
                 <div>

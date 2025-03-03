@@ -1,0 +1,9 @@
+export const OrderStatus = Object.freeze({
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE",
+    REQUIRE_UPDATE: "REQUIRE_UPDATE",
+    PENDING: "PENDING",
+    COMPLETED: "COMPLETED",
+    CANCELLED: "CANCELLED",
+    CONFIRMED: "CONFIRMED"
+});

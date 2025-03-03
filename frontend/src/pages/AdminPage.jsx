@@ -3,7 +3,7 @@ import {
     BellOutlined,
     BlockOutlined,
     BuildOutlined,
-    DesktopOutlined,
+    DesktopOutlined, FileDoneOutlined,
     FileOutlined,
     LockOutlined,
     LogoutOutlined,
@@ -23,6 +23,7 @@ import AdminDashboard from "~/components/Layout/components/AdminDashboard"
 import AdminUser from "~/components/Layout/components/AdminUser";
 import {BookOutlined} from "@mui/icons-material";
 import AdminBook from "~/components/Layout/components/AdminBook";
+import OrderConfirmation from "~/components/Layout/components/AdminOrder/OrderConfirmation";
 
 const {Content} = Layout;
 
@@ -31,6 +32,15 @@ function AdminPage() {
         {label: 'Dashboard', key: '1', icon: <DesktopOutlined/>, content: <AdminDashboard/>},
         {label: 'User', key: '2', icon: <UserOutlined/>, content: <AdminUser/>},
         {label: 'Book', key: '3', icon: <BookOutlined/>, content: <AdminBook/>},
+        {
+            label: 'Order',
+            key: 'sub1',
+            icon: <FileDoneOutlined/>,
+            children: [
+                {label: 'Order List', key: '4', content: 'Order List'},
+                {label: 'Order Confirmation ', key: '5', content: <OrderConfirmation/>},
+            ]
+        },
     ]
 
     const [selectedContent, setSelectedContent] = useState(menuItems[0].content);
