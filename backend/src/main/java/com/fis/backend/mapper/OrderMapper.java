@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class OrderMapper {
@@ -13,5 +15,9 @@ public class OrderMapper {
 
     public OrderResponse toOrderResponse(Order order) {
         return modelMapper.map(order, OrderResponse.class);
+    }
+
+    public List<OrderResponse> toOrderResponseList(List<Order> orders) {
+        return orders.stream().map(this::toOrderResponse).toList();
     }
 }

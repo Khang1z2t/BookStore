@@ -9,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDetailRequest {
-    private Integer quantity;
     private String productId;
+    private Integer quantity;
 }

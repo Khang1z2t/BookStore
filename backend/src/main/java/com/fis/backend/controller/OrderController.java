@@ -8,6 +8,9 @@ import com.fis.backend.dto.request.UpdateOrderRequest;
 import com.fis.backend.dto.response.OrderResponse;
 import com.fis.backend.services.OrderService;
 import com.fis.backend.utils.Constants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.camunda.bpm.engine.TaskService;
@@ -17,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -27,7 +31,20 @@ public class OrderController {
     OrderService orderService;
     TaskService taskService;
 
+    @GetMapping("/all")
+    @Operation(summary = "Get all orders")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrders() {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.getAllOrder()));
+    }
+
+    @GetMapping("/status/{status}")
+    @Operation(summary = "Get all orders by `status`")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByStatus(@PathVariable String status) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.getAllOrderByStatus(status)));
+    }
+
     @PostMapping
+    @Operation(summary = "Create order with list of `products`")
     public ResponseEntity<ApiResponse<OrderResponse>> createOrder(@RequestBody CreateOrderRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.createOrder(request)));
     }

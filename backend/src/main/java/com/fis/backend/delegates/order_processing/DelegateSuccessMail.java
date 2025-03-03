@@ -7,6 +7,7 @@ import com.fis.backend.repository.OrderRepository;
 import com.fis.backend.repository.UserRepository;
 import com.fis.backend.services.MailService;
 import com.fis.backend.utils.GenaratedId;
+import com.fis.backend.utils.enums.OrderStatus;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,8 @@ public class DelegateSuccessMail implements JavaDelegate {
         User user = userRepository.findById(order.getUser().getId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
+        order.setStatus(OrderStatus.CONFIRMED.toString());
+        orderRepository.save(order);
         String emailBody = loadEmailTemplate(order, user);
         try {
             // send email

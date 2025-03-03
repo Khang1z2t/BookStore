@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
         if (lastOrderId == null) {
             return genaratedId.createNewID("OD" + datePart);
         } else {
-            return genaratedId.createIDFromLastID("OD" + datePart, 10, lastOrderId);
+            return genaratedId.createIDFromLastID("OD" + datePart, 8, lastOrderId);
         }
     }
 
@@ -252,5 +252,17 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return orderMapper.toOrderResponse(order);
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrder() {
+        List<Order> orders = orderRepository.findAll();
+        return orderMapper.toOrderResponseList(orders);
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrderByStatus(String status) {
+        List<Order> orders = orderRepository.findAllByStatus(status);
+        return orderMapper.toOrderResponseList(orders);
     }
 }

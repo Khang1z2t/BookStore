@@ -12,6 +12,5 @@ public class OrderDetailResponse {
     private String id;
     private Integer quantity;
     private Double price;
-    private String color;
     private String productId;
 }

@@ -35,4 +35,5 @@ public class ProductController {
     public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", productService.getProductById(id)));
     }
+
 }
