@@ -124,6 +124,7 @@ function OrderConfirmation() {
                     onClick={fetchOrder}
                     color={'default'}
                     variant={'text'}
+                    shape={'circle'}
                 >
                 </Button>
             </div>

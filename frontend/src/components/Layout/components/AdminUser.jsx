@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 import {useAlerts} from "~/context/AlertsContext";
 
-import {Table, Button, Typography, Spin, Alert, Card, Modal, Form, Input} from 'antd';
+import {Table, Button, Typography, Alert, Card, Modal, Form} from 'antd';
 import {exportExcel, exportPdf, getAllUser} from "~/services/UserService";
-import {LoadingOutlined, ReloadOutlined, UploadOutlined} from "@ant-design/icons";
+import {LoadingOutlined, ReloadOutlined} from "@ant-design/icons";
 import UserInput from "~/components/AdminInput/UserInput";
 
 const {Title} = Typography;
@@ -154,6 +154,7 @@ function AdminUser() {
                     onClick={fetchUsers}
                     color={'default'}
                     variant={'text'}
+                    shape={'circle'}
                 >
                 </Button>
             </div>
