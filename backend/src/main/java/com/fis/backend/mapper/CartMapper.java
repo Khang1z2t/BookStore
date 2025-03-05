@@ -23,6 +23,7 @@ public class CartMapper {
     public CartResponse toCartResponse(Cart cart) {
         List<CartItemResponse> items = cart.getItems().stream()
                 .map(item -> new CartItemResponse(
+                        item.getId(),
                         item.getProduct().getId(),
                         item.getQuantity(),
                         item.getTotalPrice()

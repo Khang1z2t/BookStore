@@ -3,34 +3,36 @@ import {Link} from "react-router-dom";
 import {ShoppingCartIcon} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {Badge} from "antd";
+import {getCart} from "~/services/CartService";
 
 function CartButton() {
     const [cartCount, setCartCount] = useState(0);
 
-    const updateCartCount = () => {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updateCartCount = async () => {
+        const cartResponse = await getCart();
+        const cart = cartResponse.data.items || [];
         const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
         setCartCount(totalItems);
     };
 
     useEffect(() => {
-        updateCartCount();
+        updateCartCount().then(r => r);
 
         const handleStorageChange = () => {
-            updateCartCount();
+            updateCartCount().then(r => r);
         };
 
         window.addEventListener("storage", handleStorageChange);
         return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            updateCartCount();
-        }, 500);
-
-        return () => clearInterval(interval);
-    }, []);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         updateCartCount().then(r => r);
+    //     }, 5000);
+    //
+    //     return () => clearInterval(interval);
+    // }, []);
 
     return (
         <Box className={'mr-3'}>

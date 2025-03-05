@@ -1,7 +1,7 @@
-import { Fragment } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, {Fragment} from 'react';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {privateRoutes, publicRoutes} from '~/routers';
-import { DefaultLayout } from '~/components/Layout';
+import {DefaultLayout} from '~/components/Layout';
 import PrivateRoute from "~/routers/PrivateRoute";
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
                                 path={route.path}
                                 element={
                                     <Layout>
-                                        <Page />
+                                        <Page/>
                                     </Layout>
                                 }
                             />
@@ -49,7 +49,7 @@ function App() {
                                 element={
                                     <PrivateRoute>
                                         <Layout>
-                                            <Page />
+                                            <Page/>
                                         </Layout>
                                     </PrivateRoute>
                                 }

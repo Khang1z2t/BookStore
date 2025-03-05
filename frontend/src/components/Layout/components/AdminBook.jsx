@@ -5,6 +5,7 @@ import {getAllProduct} from "~/services/ProductService";
 import GoogleImage from "~/components/GoogleImage";
 import {LoadingOutlined, ReloadOutlined} from "@ant-design/icons";
 import ProductInput from "~/components/AdminInput/ProductInput";
+import toast from "react-hot-toast";
 
 const {Title} = Typography;
 
@@ -91,7 +92,7 @@ function AdminBook() {
     }
 
     const exportToExcel = async () => {
-
+        toast.success("Export Excel")
     }
 
     const handleFinish = (values) => {

@@ -55,6 +55,8 @@ public class CartServiceImpl implements CartService {
             cartItem.setProduct(product);
             cartItem.setQuantity(request.getQuantity());
             cartItem.setCart(cart);
+            cartItem.setTotalPrice(product.getPrice() * request.getQuantity());
+//            cartItemRepository.save(cartItem);
             cart.getItems().add(cartItem);
         }
 
@@ -88,7 +90,7 @@ public class CartServiceImpl implements CartService {
         Long userId = AuthenUtil.getUserId();
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Cart cart = cartRepository.findByUser(user).orElseGet(()-> {
+        Cart cart = cartRepository.findByUser(user).orElseGet(() -> {
             Cart newCart = new Cart();
             newCart.setUser(user);
             return cartRepository.save(newCart);

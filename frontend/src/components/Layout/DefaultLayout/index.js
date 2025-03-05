@@ -1,5 +1,6 @@
 import Header from '~/components/Layout/components/Header';
 import AppFooter from "~/components/Layout/components/Footer";
+import React from "react";
 
 
 function DefaultLayout({children}) {

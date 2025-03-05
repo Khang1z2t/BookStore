@@ -35,7 +35,7 @@ const PrivateRoute = ({children}) => {
         )
     }
 
-    return isAuthorized ? children : <Navigate to="/"/>;
+    return isAuthorized ? children : <Navigate to="/not-found"/>;
 };
 
 export default PrivateRoute;

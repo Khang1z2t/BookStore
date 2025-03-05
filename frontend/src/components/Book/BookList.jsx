@@ -1,12 +1,16 @@
 import {useState} from "react";
 import {Button, Col, Image, InputNumber, List, Modal, Row} from "antd";
 import BookCard from "~/components/Book/BookCard";
+import {addToCart, getCart, updateCartItem} from "~/services/CartService";
+import {useAlerts} from "~/context/AlertsContext";
 
 
 function BookList({books, onBuy, onAddToCart, onClick}) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [confirmLoading, setConfirmLoading] = useState(false)
+    const {showAlert} = useAlerts();
 
     // Mở popup khi ấn "Thêm giỏ hàng"
     const handleAddToCart = (book) => {
@@ -16,28 +20,18 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
     };
 
     // Lưu vào localStorage
-    const handleConfirmAddToCart = () => {
+    const handleConfirmAddToCart = async () => {
         if (!selectedBook) return;
+        setConfirmLoading(true);
+        const cartResponse = await getCart();
+        const cart = cartResponse.data.items || [];
 
-        // Lấy giỏ hàng từ localStorage (nếu chưa có thì là mảng rỗng)
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        // Kiểm tra sản phẩm đã có trong giỏ chưa
-        const existingItem = cart.find((item) => item.id === selectedBook.id);
-        if (existingItem) {
-            existingItem.quantity += quantity; // Cộng dồn số lượng
-        } else {
-            cart.push({
-                id: selectedBook.id,
-                quantity
-            });
-        }
-
-        // Lưu lại vào localStorage
-        localStorage.setItem("cart", JSON.stringify(cart));
+        await addToCart({productId: selectedBook.id, quantity});
+        showAlert("Thêm vào giỏ hàng thành công", "success");
 
         // Đóng popup
         setIsModalVisible(false);
+        setConfirmLoading(false);
     };
 
     return (
@@ -57,7 +51,7 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
                     <Button key="cancel" onClick={() => setIsModalVisible(false)}>
                         Hủy
                     </Button>,
-                    <Button key="confirm" type="primary" onClick={handleConfirmAddToCart}>
+                    <Button key="confirm" loading={confirmLoading} type="primary" onClick={handleConfirmAddToCart}>
                         Xác nhận
                     </Button>,
                 ]}

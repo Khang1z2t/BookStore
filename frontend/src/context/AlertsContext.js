@@ -1,6 +1,7 @@
-import {createContext, useContext, useState} from "react";
+import React, {createContext, useContext, useState} from "react";
 import {Alert, Snackbar} from "@mui/material";
 import SnackbarAlert from "~/components/Alerts";
+import {Toaster} from "react-hot-toast";
 
 const AlertsContext = createContext();
 
@@ -16,19 +17,19 @@ const AlertsProvider = ({children}) => {
         horizontal: 'right'
     });
 
-    const showAlert = (message, severity = 'info', duration= 5000, vertical= 'top', horizontal= 'right') => {
-        setAlert({ open: true, message, severity, duration, vertical, horizontal });
+    const showAlert = (message, severity = 'info', duration = 5000, vertical = 'top', horizontal = 'right') => {
+        setAlert({open: true, message, severity, duration, vertical, horizontal});
     };
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setAlert({ ...alert, open: false });
+        setAlert({...alert, open: false});
     };
 
     return (
-        <AlertsContext.Provider value={{ showAlert }}>
+        <AlertsContext.Provider value={{showAlert}}>
             {children}
             <SnackbarAlert
                 open={alert.open}
@@ -39,8 +40,9 @@ const AlertsProvider = ({children}) => {
                 horizontal={alert.horizontal}
                 onClose={handleClose}
             />
+            <Toaster position={"top-right"}/>
         </AlertsContext.Provider>
     );
 };
 
-export { AlertsProvider, useAlerts };
+export {AlertsProvider, useAlerts};
