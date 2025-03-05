@@ -261,6 +261,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderResponse getOrderById(String id) {
+        Order order = orderRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.INVALID_KEY));
+        return orderMapper.toOrderResponse(order);
+    }
+
+    @Override
     public List<OrderResponse> getAllOrderByStatus(String status) {
         List<Order> orders = orderRepository.findAllByStatus(status);
         return orderMapper.toOrderResponseList(orders);

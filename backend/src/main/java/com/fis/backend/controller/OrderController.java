@@ -37,6 +37,12 @@ public class OrderController {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.getAllOrder()));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get order by `id`")
+    public ResponseEntity<ApiResponse<OrderResponse>> getOrderById(@PathVariable String id) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.getOrderById(id)));
+    }
+
     @GetMapping("/status/{status}")
     @Operation(summary = "Get all orders by `status`")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByStatus(@PathVariable String status) {
@@ -50,6 +56,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}")
+    @Operation(summary = "Update order with `id`")
     public ResponseEntity<ApiResponse<OrderResponse>> updateOrder(@PathVariable String id, @RequestBody UpdateOrderRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.updateOrder(id, request)));
     }
