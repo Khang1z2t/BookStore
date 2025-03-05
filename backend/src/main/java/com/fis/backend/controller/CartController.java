@@ -28,7 +28,7 @@ public class CartController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<CartResponse>> updateCartByUser(EditCartRequest editCartRequest) {
+    public ResponseEntity<ApiResponse<CartResponse>> updateCartByUser(@RequestBody EditCartRequest editCartRequest) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", cartService.editCart(editCartRequest)));
     }
 
