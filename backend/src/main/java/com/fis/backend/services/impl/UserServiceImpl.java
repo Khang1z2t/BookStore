@@ -204,6 +204,13 @@ public class UserServiceImpl implements UserService {
         return url;
     }
 
+    @Override
+    public UserResponse getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
+    }
+
     private TokenExchangeResponse getClientToken() {
         return keycloakRepository.exchangeToken(TokenExchangeParam.builder()
                 .grant_type("client_credentials")

@@ -84,5 +84,11 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Operation(summary = "API lấy thông tin tài khoản theo id")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable Long userId) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", userService.getUserById(userId)));
+    }
 
 }

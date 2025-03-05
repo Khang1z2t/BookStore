@@ -32,4 +32,6 @@ public interface UserService {
     UserResponse getUserProfile();
 
     String uploadImage(MultipartFile file);
+
+    UserResponse getUserById(Long userId);
 }
