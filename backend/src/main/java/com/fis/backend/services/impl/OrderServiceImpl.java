@@ -72,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey(Constants.START_PROCESS, UUID.randomUUID().toString());
         User user = userRepository.findById(AuthenUtil.getUserId()).orElse(null);
-        Order lastOrderNo = orderRepository.findFirstByOrderByOrderInfoDesc();
+        Order lastOrderNo = orderRepository.findLatestOrderOfToday();
 
         double totalPrice = 0;
         double totalProduct = 0;
@@ -84,6 +84,10 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setOrderInfo(generatorOrderNO(lastOrderNo.getOrderInfo() != null ? lastOrderNo.getOrderInfo() : null));
         orderRepository.save(order);
+
+        if (request.getOrderDetails() == null) {
+            orderIsValid = false;
+        }
 
         for (OrderDetailRequest detailRequest : request.getOrderDetails()) {
             Product product = productRepository.findById(detailRequest.getProductId()).orElse(null);
@@ -112,6 +116,9 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalPrice(totalPrice);
         order.setTotalProduct(totalProduct);
         order.setBusinessKey(processInstance.getBusinessKey());
+        if (!orderIsValid) {
+            order.setStatus(OrderStatus.REQUIRE_UPDATE.toString());
+        }
         orderRepository.save(order);
 
         OrderResponse orderResponse = new OrderResponse();
@@ -122,8 +129,6 @@ public class OrderServiceImpl implements OrderService {
         orderResponse.setStatus(order.getStatus());
         orderResponse.setOrderDetails(orderDetailResponses);
         orderResponse.setUserId(order.getUser().getId());
-
-
 
 
         String businessKey = processInstance.getBusinessKey();
