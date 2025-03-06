@@ -36,4 +36,9 @@ public class CartController {
     public ResponseEntity<ApiResponse<Boolean>> deleteCartByUser(@PathVariable String cartItemId) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", cartService.deleteCart(cartItemId)));
     }
+
+    @DeleteMapping("/user")
+    public ResponseEntity<ApiResponse<Boolean>> deleteCartByUser() {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", cartService.deleteAllCartItemByUserId()));
+    }
 }

@@ -117,11 +117,13 @@ public class OrderServiceImpl implements OrderService {
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setId(order.getId());
         orderResponse.setTotalPrice(totalPrice);
-        orderResponse.setTotalItem(totalProduct);
+        orderResponse.setTotalProduct(totalProduct);
         orderResponse.setOrderInfo(order.getOrderInfo());
         orderResponse.setStatus(order.getStatus());
         orderResponse.setOrderDetails(orderDetailResponses);
         orderResponse.setUserId(order.getUser().getId());
+
+
 
 
         String businessKey = processInstance.getBusinessKey();

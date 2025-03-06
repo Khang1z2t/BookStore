@@ -14,4 +14,6 @@ public interface CartService {
     Boolean deleteCart(String cartId);
 
     CartResponse getCartByUser();
+
+    Boolean deleteAllCartItemByUserId();
 }

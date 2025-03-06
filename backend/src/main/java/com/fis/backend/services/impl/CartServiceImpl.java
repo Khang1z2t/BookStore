@@ -18,6 +18,7 @@ import com.fis.backend.services.CartService;
 import com.fis.backend.utils.AuthenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,5 +97,22 @@ public class CartServiceImpl implements CartService {
             return cartRepository.save(newCart);
         });
         return cartMapper.toCartResponse(cart);
+    }
+
+    @Override
+    @Transactional
+    public Boolean deleteAllCartItemByUserId() {
+        try {
+            Long userId = AuthenUtil.getUserId();
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            Cart cart = cartRepository.findByUser(user).orElseThrow(
+                    () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+            cartItemRepository.deleteByCart(cart);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
