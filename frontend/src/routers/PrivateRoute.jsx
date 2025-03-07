@@ -16,7 +16,7 @@ const PrivateRoute = ({children}) => {
             }
 
             try {
-                const roleResponse = await getUserRole();
+                const roleResponse = await getUserRole(token.access_token);
                 setIsAuthorized(roleResponse.data !== false);
             } catch (error) {
                 setIsAuthorized(false);

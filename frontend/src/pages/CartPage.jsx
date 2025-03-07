@@ -1,11 +1,12 @@
 import {useState, useEffect} from "react";
 import {Button, Card, Row, Col, Typography, message, InputNumber, Table, Image, Spin} from "antd";
-import {UserOutlined, PercentageOutlined, GiftOutlined, LoadingOutlined} from "@ant-design/icons";
+import {UserOutlined, PercentageOutlined, GiftOutlined, LoadingOutlined, DeleteOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {findProductById} from "~/services/ProductService";
 import {createOrder} from "~/services/OrderService";
 import {useAlerts} from "~/context/AlertsContext";
-import {deleteCartItem, getCart, updateCartItem} from "~/services/CartService";
+import {deleteCartByUser, deleteCartItem, getCart, updateCartItem} from "~/services/CartService";
+import {useCart} from "~/context/CartContext";
 
 
 const {Title, Text} = Typography;
@@ -13,14 +14,19 @@ const {Title, Text} = Typography;
 function CartPage() {
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [orderLoading, setOrderLoading] = useState(false)
     const [totalPrice, setTotalPrice] = useState(0);
+    const [loadingItems, setLoadingItems] = useState({});
     const {showAlert} = useAlerts();
+    const {updateCartCount, cartCount} = useCart();
     const columns = [
         {
             title: "Hình ảnh",
             dataIndex: "imageUrl",
-            render: (text) => <Image.PreviewGroup><Image src={`https://lh3.googleusercontent.com/d/${text}`} width={80}
-                                                         height={100}/></Image.PreviewGroup>,
+            render: (text) =>
+                <Image.PreviewGroup>
+                    <Image src={`https://lh3.googleusercontent.com/d/${text}`} width={80}
+                           height={100}/></Image.PreviewGroup>,
         },
         {
             title: "Tên sản phẩm",
@@ -35,7 +41,8 @@ function CartPage() {
             title: "Số lượng",
             dataIndex: "quantity",
             render: (text, record) => (
-                <InputNumber min={1} value={text} onChange={(value) => updateQuantity(record.id, value)}/>
+                <InputNumber min={1} value={text} onChange={
+                    (value) => updateQuantity(record.id, value)}/>
             ),
         },
         {
@@ -45,12 +52,14 @@ function CartPage() {
         {
             title: "Hành động",
             render: (_, record) => (
-                <Button color="danger" variant="filled" onClick={() => removeItem(record.id)}>
+                <Button color="danger" variant="filled"
+                        onClick={() => removeItem(record.id)}
+                        icon={<DeleteOutlined/>}
+                        loading={loadingItems[record.id]}>
                     Xóa
                 </Button>
             ),
-        },
-    ];
+        },];
     const fetchProductById = async (id) => {
         try {
             const response = await findProductById(id);
@@ -67,7 +76,6 @@ function CartPage() {
             const cartResponse = await getCart();
             const storedCart = cartResponse.data.items || [];
 
-            console.log("storedCart", storedCart);
             if (storedCart.length === 0) {
                 setCart([]);
                 setLoading(false);
@@ -87,7 +95,6 @@ function CartPage() {
                     } : null;
                 })
             );
-            console.log("updatedCart", updatedCart);
 
             // Loại bỏ sản phẩm null (nếu API lỗi hoặc không tìm thấy)
             const validCart = updatedCart.filter((item) => item !== null);
@@ -103,11 +110,11 @@ function CartPage() {
 
     useEffect(() => {
         loadCart().then(r => r);
-    }, []);
+    }, [cartCount]);
 
     // Xóa sản phẩm khỏi giỏ hàng
     const removeItem = async (id) => {
-        setLoading(true)
+        setLoadingItems((prev) => ({...prev, [id]: true}));
         try {
             await deleteCartItem(id)
             const updatedCart = cart.filter((item) => item.id !== id);
@@ -120,7 +127,8 @@ function CartPage() {
         } catch (e) {
             console.log(e)
         } finally {
-            setLoading(false);
+            updateCartCount()
+            setLoadingItems((prev) => ({...prev, [id]: false}));
         }
     };
 
@@ -139,32 +147,27 @@ function CartPage() {
         } catch (e) {
 
         } finally {
-
+            updateCartCount()
         }
     };
 
     const handleOrder = async () => {
-        setLoading(true);
-
+        setOrderLoading(true);
         const orderPayload = {
-            orderDetails: cart.map(({id, quantity}) => ({
-                productId: id,
+            orderDetails: cart.map(({productId, quantity}) => ({
+                productId,
                 quantity
             }))
         };
-        console.log("orderPayload", orderPayload);
         try {
-            const response = await createOrder(orderPayload);
-
-            if (response) {
-                message.success("Đã xác nhận đơn hàng!").then(r => r);
-                localStorage.removeItem("cart");
-                setCart([]);
-            }
+            await createOrder(orderPayload);
+            message.success("Đã xác nhận đơn hàng!").then(r => r);
+            await deleteCartByUser()
         } catch (error) {
-            message.error("Đã xảy ra lỗi khi xác nhận đơn hàng!").then(r => r);
+            console.log(error);
         } finally {
-            setLoading(false);
+            setOrderLoading(false);
+            updateCartCount();
             showAlert("Đã xác nhận đơn hàng!", "success");
         }
     }
@@ -266,6 +269,7 @@ function CartPage() {
                                 <div className="mt-6 text-right">
                                     <Title level={4}>Tổng tiền: {totalPrice.toLocaleString("vi-VN")} đ</Title>
                                     <Button color="default" variant="solid" className="mt-4 w-full"
+                                            loading={orderLoading}
                                             onClick={handleOrder}>Xác nhận thanh
                                         toán</Button>
                                 </div>

@@ -39,11 +39,10 @@ const getUserProfile = async (token) => {
     return response.data;
 }
 
-const getUserRole = async () => {
-    const token = JSON.parse(localStorage.getItem('token'));
+const getUserRole = async (token) => {
     const response = await httpRequest.get('/auth/check-role', {
         headers: {
-            Authorization: `Bearer ${token.access_token}`
+            Authorization: `Bearer ${token}`
         }
     });
     return response.data;
@@ -81,10 +80,21 @@ const exportExcel = async () => {
     return response.data;
 }
 
+const getUserById = async (id) => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.get(`/user/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`
+        }
+    });
+    return response.data;
+}
+
 export {
     loginUser,
     registerUser,
     getUserProfile,
+    getUserById,
     updateUser,
     refreshToken,
     getUserRole,

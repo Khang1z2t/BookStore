@@ -18,10 +18,9 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import {Search, SearchIconWrapper, StyledInputBase} from '~/components/Layout/components/Search';
 import {getUserProfile, getUserRole} from "~/services/UserService";
-import {refreshUserToken} from "~/services/AuthService";
 import {useAlerts} from "~/context/AlertsContext";
-import {ShoppingCartIcon} from "lucide-react";
 import CardButton from "~/components/Layout/components/CardButton";
+import {useCart} from "~/context/CartContext";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
@@ -30,10 +29,16 @@ function Header() {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
     const [user, setUser] = React.useState(null);
     const [role, setRole] = React.useState(null);
-    const [settings, setSettings] = React.useState(['Profile', 'Account', 'Dashboard', 'Logout']);
+    const [settings, setSettings] = React.useState({
+        profile: "Profile",
+        account: "Account",
+        dashboard: "Dashboard",
+        logout: "Logout"
+    });
     const navigate = useNavigate();
     const token = JSON.parse(localStorage.getItem('token'));
     const {showAlert} = useAlerts();
+    const {updateCartCount} = useCart()
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -41,39 +46,39 @@ function Header() {
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
     };
-
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
-
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+    const handleSettingClick = (settingKey) => {
+        const settingValue = settings[settingKey];
 
-    const handleSettingClick = (setting) => {
-        switch (setting) {
-            case 'Profile':
-                navigate('/profile');
+        switch (settingValue) {
+            case "Profile":
+                navigate("/profile");
                 break;
-            case 'Account':
-                navigate('/account');
+            case "Account":
+                navigate("/account");
                 break;
-            case 'Dashboard':
-                navigate('/dashboard');
+            case "Dashboard":
+                navigate("/dashboard");
                 break;
-            case 'Logout':
-                localStorage.removeItem('token');
-                navigate('/');
-                showAlert('Logout successfully', 'success');
+            case "Logout":
+                handleLogout();
+                navigate("/");
+                showAlert("Logout successfully", "success");
                 break;
-            case 'Admin':
-                navigate('/admin');
+            case "Admin":
+                navigate("/admin");
                 break;
             default:
                 break;
         }
         handleCloseUserMenu();
     };
+
 
     const AuthBtn = () => {
         const location = useLocation();
@@ -89,30 +94,55 @@ function Header() {
         )
     }
 
+    const getUser = async () => {
+        const token = JSON.parse(localStorage.getItem('token'));
+        if (!token) {
+            setUser(null);
+            return;
+        }
+        try {
+            const response = await getUserProfile(token.access_token);
+            setUser(response.data);
+        } catch (error) {
+            localStorage.removeItem('token');
+            setUser(null);
+            navigate('/login');
+            showAlert('Failed to get user profile, please login again', 'error');
+        }
+    };
+
     useEffect(() => {
-        const getUser = async () => {
-            const token = JSON.parse(localStorage.getItem('token'));
-            if (!token) {
-                setUser(null);
-                return;
-            }
-            try {
-                const response = await getUserProfile(token.access_token);
-                setUser(response.data);
-                const roleResponse = await getUserRole();
-                setRole(roleResponse.data);
-                if (role === 'admin' && !settings.includes('Admin')) {
-                    setSettings(prevSettings => [...prevSettings, 'Admin']);
-                }
-            } catch (error) {
-                localStorage.removeItem('token');
-                setUser(null);
-                navigate('/login');
-                showAlert('Failed to get user profile, please login again', 'error');
-            }
-        };
         getUser().then(r => r);
-    }, [navigate, showAlert, role]);
+        checkUserRole().then(r => r);
+    }, [navigate, role]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setSettings(prevSettings => {
+            const newSettings = {...prevSettings}; // Copy object cũ
+            delete newSettings?.admin; // Xóa "Admin" nếu có
+            return newSettings;
+        });
+        setUser(null);
+    }
+
+    const checkUserRole = async () => {
+        const token = JSON.parse(localStorage.getItem('token'));
+        if (!token) return null;
+        const roleResponse = await getUserRole(token.access_token);
+        setRole(roleResponse.data);
+        setSettings(prevSettings => {
+            const newSettings = {...prevSettings};
+
+            if (roleResponse.data === "admin") {
+                newSettings.admin = "Admin"; // Thêm nếu là admin
+            } else {
+                delete newSettings.admin; // Xóa nếu không phải admin
+            }
+
+            return newSettings;
+        });
+    }
 
     return (
         <AppBar position="sticky" sx={{backgroundColor: '#000000'}}>
@@ -133,8 +163,7 @@ function Header() {
                             fontWeight: 600,
                             color: 'inherit',
                             textDecoration: 'none',
-                        }}
-                    >
+                        }}>
                         Bookstore
                     </Typography>
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
@@ -191,14 +220,10 @@ function Header() {
                         LOGO
                     </Typography>
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                {page}
-                            </Button>
+                        {Object.entries(settings).map(([key, value]) => (
+                            <MenuItem key={key} onClick={() => handleSettingClick(key)}>
+                                {value}
+                            </MenuItem>
                         ))}
                     </Box>
                     <Search>
@@ -233,9 +258,9 @@ function Header() {
                                     open={Boolean(anchorElUser)}
                                     onClose={handleCloseUserMenu}
                                 >
-                                    {settings.map((setting) => (
-                                        <MenuItem key={setting} onClick={() => handleSettingClick(setting)}>
-                                            <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
+                                    {Object.entries(settings).map(([key, value]) => (
+                                        <MenuItem key={key} onClick={() => handleSettingClick(key)}>
+                                            {value}
                                         </MenuItem>
                                     ))}
                                 </Menu>

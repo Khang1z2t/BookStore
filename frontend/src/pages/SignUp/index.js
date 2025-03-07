@@ -13,13 +13,13 @@ import Typography from '@mui/material/Typography';
 import BookIcon from '@mui/icons-material/Book';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
+import {styled} from '@mui/material/styles';
+import {FacebookIcon, GoogleIcon} from '~/components/CustomIcon';
 import styles from './SignUp.module.scss';
-import { registerUser } from '~/services/UserService';
+import {registerUser} from '~/services/UserService';
 import {useAlerts} from "~/context/AlertsContext";
 
-const Card = styled(MuiCard)(({ theme }) => ({
+const Card = styled(MuiCard)(({theme}) => ({
     display: 'flex',
     flexDirection: 'column',
     alignSelf: 'center',
@@ -36,7 +36,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
     }),
 }));
 
-const SignUpContainer = styled(Stack)(({ theme }) => ({
+const SignUpContainer = styled(Stack)(({theme}) => ({
     minHeight: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
     padding: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
@@ -56,7 +56,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
     },
 }));
 
-function SignUp({ disableCustomTheme }) {
+function SignUp({disableCustomTheme}) {
     const [register, setRegister] = React.useState({
         username: '',
         email: '',
@@ -74,8 +74,9 @@ function SignUp({ disableCustomTheme }) {
     const [firstNameErrorMessage, setFirstNameErrorMessage] = React.useState('');
     const [lastNameError, setLastNameError] = React.useState(false);
     const [lastNameErrorMessage, setLastNameErrorMessage] = React.useState('');
-    const { showAlert } = useAlerts();
+    const {showAlert} = useAlerts();
     const nagivate = useNavigate();
+
 
     const validateInputs = () => {
         const email = document.getElementById('email');
@@ -135,7 +136,7 @@ function SignUp({ disableCustomTheme }) {
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setRegister((prevState) => ({
             ...prevState,
             [name]: value,
@@ -172,24 +173,24 @@ function SignUp({ disableCustomTheme }) {
 
     return (
         <>
-            <CssBaseline enableColorScheme />
+            <CssBaseline enableColorScheme/>
             <SignUpContainer className={styles.SignUpContainer} direction="column" justifyContent="space-between">
                 <Card variant="outlined">
-                    <BookIcon />
+                    <BookIcon/>
                     <Typography
                         component="h1"
                         variant="h4"
-                        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+                        sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)'}}
                     >
                         Sign up
                     </Typography>
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
-                        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                        sx={{display: 'flex', flexDirection: 'column', gap: 2}}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="firstName" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="firstName" sx={{userSelect: 'none'}}>
                                 First name
                             </FormLabel>
                             <TextField
@@ -207,7 +208,7 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="lastName" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="lastName" sx={{userSelect: 'none'}}>
                                 Last name
                             </FormLabel>
                             <TextField
@@ -225,7 +226,7 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="username" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="username" sx={{userSelect: 'none'}}>
                                 Username
                             </FormLabel>
                             <TextField
@@ -244,7 +245,7 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="email" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="email" sx={{userSelect: 'none'}}>
                                 Email
                             </FormLabel>
                             <TextField
@@ -263,7 +264,7 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="password" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="password" sx={{userSelect: 'none'}}>
                                 Password
                             </FormLabel>
                             <TextField
@@ -283,7 +284,7 @@ function SignUp({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControlLabel
-                            control={<Checkbox value="allowExtraEmails" color="inherit" />}
+                            control={<Checkbox value="allowExtraEmails" color="inherit"/>}
                             label="I want to receive updates via email."
                             sx={{
                                 userSelect: 'none',
@@ -294,14 +295,14 @@ function SignUp({ disableCustomTheme }) {
                         </Button>
                     </Box>
                     <Divider>
-                        <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+                        <Typography sx={{color: 'text.secondary'}}>or</Typography>
                     </Divider>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                         <Button
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign up with Google')}
-                            startIcon={<GoogleIcon />}
+                            startIcon={<GoogleIcon/>}
                             color="inherit"
                         >
                             Sign up with Google
@@ -310,12 +311,12 @@ function SignUp({ disableCustomTheme }) {
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign up with Facebook')}
-                            startIcon={<FacebookIcon />}
+                            startIcon={<FacebookIcon/>}
                             color="inherit"
                         >
                             Sign up with Facebook
                         </Button>
-                        <Typography sx={{ textAlign: 'center' }}>
+                        <Typography sx={{textAlign: 'center'}}>
                             Already have an account?{' '}
                             <Typography
                                 component={Link}

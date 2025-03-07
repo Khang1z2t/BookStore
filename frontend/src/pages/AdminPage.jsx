@@ -24,6 +24,7 @@ import AdminUser from "~/components/Layout/components/AdminUser";
 import {BookOutlined} from "@mui/icons-material";
 import AdminBook from "~/components/Layout/components/AdminBook";
 import OrderConfirmation from "~/components/Layout/components/AdminOrder/OrderConfirmation";
+import OrderList from "~/components/Layout/components/AdminOrder/OrderList";
 
 const {Content} = Layout;
 
@@ -37,7 +38,7 @@ function AdminPage() {
             key: 'sub1',
             icon: <FileDoneOutlined/>,
             children: [
-                {label: 'Order List', key: '4', content: 'Order List'},
+                {label: 'Order List', key: '4', content: <OrderList/>},
                 {label: 'Order Confirmation ', key: '5', content: <OrderConfirmation/>},
             ]
         },

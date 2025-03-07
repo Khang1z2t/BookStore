@@ -3,6 +3,7 @@ import {Button, Col, Image, InputNumber, List, Modal, Row} from "antd";
 import BookCard from "~/components/Book/BookCard";
 import {addToCart, getCart, updateCartItem} from "~/services/CartService";
 import {useAlerts} from "~/context/AlertsContext";
+import {useCart} from "~/context/CartContext";
 
 
 function BookList({books, onBuy, onAddToCart, onClick}) {
@@ -11,6 +12,7 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
     const [quantity, setQuantity] = useState(1);
     const [confirmLoading, setConfirmLoading] = useState(false)
     const {showAlert} = useAlerts();
+    const {updateCartCount} = useCart();
 
     // Mở popup khi ấn "Thêm giỏ hàng"
     const handleAddToCart = (book) => {
@@ -23,8 +25,6 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
     const handleConfirmAddToCart = async () => {
         if (!selectedBook) return;
         setConfirmLoading(true);
-        const cartResponse = await getCart();
-        const cart = cartResponse.data.items || [];
 
         await addToCart({productId: selectedBook.id, quantity});
         showAlert("Thêm vào giỏ hàng thành công", "success");
@@ -32,6 +32,7 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
         // Đóng popup
         setIsModalVisible(false);
         setConfirmLoading(false);
+        updateCartCount();
     };
 
     return (

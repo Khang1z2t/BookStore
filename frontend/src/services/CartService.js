@@ -2,6 +2,7 @@ import httpRequest from "~/utils/httpRequest";
 
 const getCart = async () => {
     const token = JSON.parse(localStorage.getItem('token'));
+    if (!token) return null;
     const response = await httpRequest.get('/cart', {
         headers: {
             Authorization: `Bearer ${token.access_token}`,
@@ -30,9 +31,20 @@ const deleteCartItem = async (id) => {
     return response.data;
 }
 
+const deleteCartByUser = async () => {
+    const token = JSON.parse(localStorage.getItem('token'));
+    const response = await httpRequest.delete('/cart/user', {
+        headers: {
+            Authorization: `Bearer ${token.access_token}`,
+        }
+    });
+    return response.data;
+}
+
 export {
     deleteCartItem,
     addToCart,
     getCart,
-    updateCartItem
+    updateCartItem,
+    deleteCartByUser
 }

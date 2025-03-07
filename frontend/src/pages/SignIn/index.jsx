@@ -11,15 +11,17 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import BookIcon from '@mui/icons-material/Book';
-import { Card, SignInContainer } from '~/components/Signin';
+import {Card, SignInContainer} from '~/components/Signin';
 import ForgotPassword from '~/components/ForgotPassword';
-import { FacebookIcon, GoogleIcon } from '~/components/CustomIcon';
+import {FacebookIcon, GoogleIcon} from '~/components/CustomIcon';
 import styles from './SignIn.module.scss';
 import {useAlerts} from "~/context/AlertsContext";
 import {loginUser, getUserProfile} from "~/services/UserService";
+import {updateCartItem} from "~/services/CartService";
+import {useCart} from "~/context/CartContext";
 
 
-function SignIn({ disableCustomTheme }) {
+function SignIn({disableCustomTheme}) {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [usernameError, setUsernameError] = React.useState(false);
@@ -27,9 +29,9 @@ function SignIn({ disableCustomTheme }) {
     const [passwordError, setPasswordError] = React.useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [open, setOpen] = React.useState(false);
-    const { showAlert } = useAlerts();
+    const {showAlert} = useAlerts();
     const navigate = useNavigate();
-
+    const {updateCartCount} = useCart()
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -48,6 +50,7 @@ function SignIn({ disableCustomTheme }) {
                 const token = {access_token, refresh_token};
                 localStorage.setItem('token', JSON.stringify(token));
                 navigate('/profile');
+                updateCartCount();
                 // const user = await getUserProfile(token.access_token).data;
             } catch (error) {
                 if (error.response) {
@@ -97,14 +100,14 @@ function SignIn({ disableCustomTheme }) {
 
     return (
         <>
-            <CssBaseline enableColorScheme />
+            <CssBaseline enableColorScheme/>
             <SignInContainer className={styles.SignInContainer} direction="column" justifyContent="space-between">
                 <Card variant="outlined">
-                    <BookIcon />
+                    <BookIcon/>
                     <Typography
                         component="h1"
                         variant="h4"
-                        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+                        sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)'}}
                     >
                         Sign in
                     </Typography>
@@ -120,7 +123,7 @@ function SignIn({ disableCustomTheme }) {
                         }}
                     >
                         <FormControl>
-                            <FormLabel htmlFor="username" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="username" sx={{userSelect: 'none'}}>
                                 Username
                             </FormLabel>
                             <TextField
@@ -140,7 +143,7 @@ function SignIn({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel htmlFor="password" sx={{ userSelect: 'none' }}>
+                            <FormLabel htmlFor="password" sx={{userSelect: 'none'}}>
                                 Password
                             </FormLabel>
                             <TextField
@@ -160,11 +163,11 @@ function SignIn({ disableCustomTheme }) {
                             />
                         </FormControl>
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="inherit" />}
+                            control={<Checkbox value="remember" color="inherit"/>}
                             label="Remember me"
-                            sx={{ userSelect: 'none' }}
+                            sx={{userSelect: 'none'}}
                         />
-                        <ForgotPassword open={open} handleClose={handleClose} />
+                        <ForgotPassword open={open} handleClose={handleClose}/>
                         <Button type="submit" fullWidth variant="contained" onClick={validateInputs} color="inherit">
                             Sign in
                         </Button>
@@ -183,12 +186,12 @@ function SignIn({ disableCustomTheme }) {
                         </Typography>
                     </Box>
                     <Divider>or</Divider>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                         <Button
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign in with Google')}
-                            startIcon={<GoogleIcon />}
+                            startIcon={<GoogleIcon/>}
                             color="inherit"
                         >
                             Sign in with Google
@@ -197,12 +200,12 @@ function SignIn({ disableCustomTheme }) {
                             fullWidth
                             variant="outlined"
                             onClick={() => alert('Sign in with Facebook')}
-                            startIcon={<FacebookIcon />}
+                            startIcon={<FacebookIcon/>}
                             color="inherit"
                         >
                             Sign in with Facebook
                         </Button>
-                        <Typography sx={{ textAlign: 'center' }}>
+                        <Typography sx={{textAlign: 'center'}}>
                             Don&apos;t have an account?{' '}
                             <Typography
                                 component={Link}
