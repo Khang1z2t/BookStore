@@ -7,6 +7,7 @@ import AdminPage from "~/pages/AdminPage";
 import NoLayout from "~/components/Layout/NoLayout";
 import CartPage from "~/pages/CartPage";
 import NotFoundPage from "~/pages/NotFoundPage";
+import ConfirmOrderPage from "~/pages/ConfirmOrderPage";
 
 const publicRoutes = [
     {path: '/', component: Home},
@@ -15,6 +16,7 @@ const publicRoutes = [
     {path: '/profile', component: Profile},
     {path: '/edit-profile', component: EditProfile},
     {path: '/cart', component: CartPage},
+    {path: '/confirm-order', component: ConfirmOrderPage},
     {path: '/not-found', component: NotFoundPage}
 ]
 

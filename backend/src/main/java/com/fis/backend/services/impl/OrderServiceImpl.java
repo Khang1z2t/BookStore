@@ -1,8 +1,6 @@
 package com.fis.backend.services.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fis.backend.dto.ApiResponse;
 import com.fis.backend.dto.request.CreateOrderRequest;
 import com.fis.backend.dto.request.OrderDetailRequest;
 import com.fis.backend.dto.request.UpdateOrderRequest;
@@ -21,7 +19,6 @@ import com.fis.backend.repository.OrderRepository;
 import com.fis.backend.repository.ProductRepository;
 import com.fis.backend.repository.UserRepository;
 import com.fis.backend.services.OrderService;
-import com.fis.backend.services.UserService;
 import com.fis.backend.utils.AuthenUtil;
 import com.fis.backend.utils.Constants;
 import com.fis.backend.utils.GenaratedId;
@@ -33,10 +30,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.cloud.logging.LoggingRebinder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

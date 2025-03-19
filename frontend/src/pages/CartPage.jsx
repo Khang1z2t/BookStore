@@ -1,7 +1,7 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {Button, Card, Row, Col, Typography, message, InputNumber, Table, Image, Spin} from "antd";
 import {UserOutlined, PercentageOutlined, GiftOutlined, LoadingOutlined, DeleteOutlined} from "@ant-design/icons";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {findProductById} from "~/services/ProductService";
 import {createOrder} from "~/services/OrderService";
 import {useAlerts} from "~/context/AlertsContext";
@@ -19,6 +19,8 @@ function CartPage() {
     const [loadingItems, setLoadingItems] = useState({});
     const {showAlert} = useAlerts();
     const {updateCartCount, cartCount} = useCart();
+    const navigate = useNavigate();
+    const updateTimeoutRef = useRef(null);
     const columns = [
         {
             title: "Hình ảnh",
@@ -71,48 +73,52 @@ function CartPage() {
     }
 
     const loadCart = async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const cartResponse = await getCart();
             const storedCart = cartResponse.data.items || [];
 
             if (storedCart.length === 0) {
                 setCart([]);
-                setLoading(false);
+                setTotalPrice(0); // Đặt tổng tiền về 0 nếu giỏ hàng trống
                 return;
             }
 
-            // Gọi API lấy thông tin từng sản phẩm theo ID
-            const updatedCart = await Promise.all(
+            // Gọi API lấy thông tin từng sản phẩm theo ID (dùng Promise.allSettled để tránh lỗi làm mất dữ liệu)
+            const updatedCartResults = await Promise.allSettled(
                 storedCart.map(async (item) => {
-                    // Giả sử fetchProductById trả về response chứa data
-                    const product = await fetchProductById(item.productId);
-                    return product ? {
-                        ...product,
-                        id: item.id,
-                        productId: product.id,
-                        quantity: item.quantity
-                    } : null;
+                    try {
+                        const product = await fetchProductById(item.productId);
+                        return product
+                            ? {...product, id: item.id, productId: product.id, quantity: item.quantity}
+                            : null;
+                    } catch (error) {
+                        console.error(`Lỗi lấy sản phẩm ${item.productId}:`, error);
+                        return null; // Không làm crash toàn bộ giỏ hàng
+                    }
                 })
             );
 
-            // Loại bỏ sản phẩm null (nếu API lỗi hoặc không tìm thấy)
-            const validCart = updatedCart.filter((item) => item !== null);
+            // Lọc sản phẩm hợp lệ
+            const validCart = updatedCartResults
+                .filter(result => result.status === "fulfilled" && result.value !== null)
+                .map(result => result.value);
+
             setCart(validCart);
-            // Tính tổng tiền
-            const total = validCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            setTotalPrice(total);
-        } catch (e) {
+
+            setTotalPrice(validCart.reduce((sum, item) => sum + item.price * item.quantity, 0));
+        } catch (error) {
+            console.error("Lỗi khi tải giỏ hàng:", error);
         } finally {
             setLoading(false);
         }
     };
 
+
     useEffect(() => {
         loadCart().then(r => r);
     }, [cartCount]);
 
-    // Xóa sản phẩm khỏi giỏ hàng
     const removeItem = async (id) => {
         setLoadingItems((prev) => ({...prev, [id]: true}));
         try {
@@ -134,35 +140,36 @@ function CartPage() {
 
     // Cập nhật số lượng sản phẩm
     const updateQuantity = async (cartItemId, quantity) => {
-        try {
-            await updateCartItem({cartItemId, quantity});
-            const updatedCart = cart.map((item) =>
-                item.id === cartItemId ? {...item, quantity} : item
-            );
-            setCart(updatedCart);
+        setCart((prevCart) =>
+            prevCart.map((item) =>
+                item.id === cartItemId ? {...item, quantity: quantity} : item
+            )
+        );
 
-            // Tính lại tổng
-            const total = updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            setTotalPrice(total);
-        } catch (e) {
+        setTotalPrice((prevTotal) =>
+            prevTotal + cart.find(item => item.id === cartItemId)?.price * (quantity - cart.find(item => item.id === cartItemId)?.quantity || 0)
+        );
 
-        } finally {
-            updateCartCount()
+        if (updateTimeoutRef.current) {
+            clearTimeout(updateTimeoutRef.current);
         }
+
+        updateTimeoutRef.current = setTimeout(async () => {
+            try {
+                await updateCartItem({cartItemId, quantity});
+            } catch (e) {
+                console.log(e);
+            } finally {
+                updateCartCount();
+            }
+        }, 500);
+
     };
 
     const handleOrder = async () => {
-        setOrderLoading(true);
-        const orderPayload = {
-            orderDetails: cart.map(({productId, quantity}) => ({
-                productId,
-                quantity
-            }))
-        };
         try {
-            await createOrder(orderPayload);
-            message.success("Đã xác nhận đơn hàng!").then(r => r);
-            await deleteCartByUser()
+            console.log(cart)
+            navigate("/confirm-order", {state: {cartItems: cart}})
         } catch (error) {
             console.log(error);
         } finally {

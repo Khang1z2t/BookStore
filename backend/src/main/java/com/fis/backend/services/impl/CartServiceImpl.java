@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,6 +75,7 @@ public class CartServiceImpl implements CartService {
             cartItemRepository.delete(cartItem);
         } else {
             cartItem.setQuantity(request.getQuantity());
+            cartItem.setUpdatedAt(Instant.now());
             cartItemRepository.save(cartItem);
         }
         return cartMapper.toCartResponse(cartItem.getCart());

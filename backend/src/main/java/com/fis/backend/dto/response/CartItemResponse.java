@@ -3,6 +3,8 @@ package com.fis.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,4 +15,6 @@ public class CartItemResponse {
     String productId;
     Integer quantity;
     Double totalPrice;
+    Instant createdAt;
+    Instant updatedAt;
 }

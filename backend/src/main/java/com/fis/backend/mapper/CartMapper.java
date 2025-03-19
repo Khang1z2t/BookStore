@@ -4,10 +4,12 @@ import com.fis.backend.dto.request.AddCartRequest;
 import com.fis.backend.dto.response.CartItemResponse;
 import com.fis.backend.dto.response.CartResponse;
 import com.fis.backend.entity.Cart;
+import com.fis.backend.entity.CartItem;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +24,14 @@ public class CartMapper {
 
     public CartResponse toCartResponse(Cart cart) {
         List<CartItemResponse> items = cart.getItems().stream()
+                .sorted(Comparator.comparing(CartItem::getCreatedAt).reversed())
                 .map(item -> new CartItemResponse(
                         item.getId(),
                         item.getProduct().getId(),
                         item.getQuantity(),
-                        item.getTotalPrice()
+                        item.getTotalPrice(),
+                        item.getCreatedAt(),
+                        item.getUpdatedAt()
                 ))
                 .collect(Collectors.toList());
 
