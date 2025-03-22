@@ -1,6 +1,7 @@
 package com.fis.backend.repository;
 
 import com.fis.backend.entity.Order;
+import com.fis.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     Order findLatestOrderOfToday();
 
     List<Order> findAllByStatus(String status);
+
+    List<Order> findAllByUser(User user);
 }

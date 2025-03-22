@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setStatus(OrderStatus.PENDING.toString());
         order.setUser(user);
-        order.setOrderInfo(generatorOrderNO(lastOrderNo.getOrderInfo() != null ? lastOrderNo.getOrderInfo() : null));
+        order.setOrderInfo(generatorOrderNO(lastOrderNo != null ? lastOrderNo.getOrderInfo() : null));
         orderRepository.save(order);
 
         if (request.getOrderDetails() == null) {
@@ -271,6 +271,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponse> getAllOrderByStatus(String status) {
         List<Order> orders = orderRepository.findAllByStatus(status);
+        return orderMapper.toOrderResponseList(orders);
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrderByUser() {
+        Long userId = AuthenUtil.getUserId();
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        List<Order> orders = orderRepository.findAllByUser(user);
         return orderMapper.toOrderResponseList(orders);
     }
 }

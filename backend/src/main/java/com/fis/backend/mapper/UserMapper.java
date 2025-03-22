@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(source = "userDetail.gender", target = "gender")
     @Mapping(source = "userDetail.address", target = "address")
     @Mapping(source = "userDetail.phoneNumber", target = "phoneNumber")
     @Mapping(source = "userDetail.dateOfBirth", target = "dateOfBirth")
@@ -22,6 +23,7 @@ public interface UserMapper {
     @Mapping(source = "userDetail.updatedAt", target = "updatedAt")
     UserResponse toUserResponse(User user);
 
+    @Mapping(source = "userDetail.gender", target = "gender")
     @Mapping(source = "userDetail.address", target = "address")
     @Mapping(source = "userDetail.phoneNumber", target = "phoneNumber")
     @Mapping(source = "userDetail.dateOfBirth", target = "dateOfBirth")
@@ -29,7 +31,9 @@ public interface UserMapper {
     UserDetailReportDTO toUserDetailReportDTO(User user);
 
     User toUser(UserRequest userRequest);
+
     User toUser(RegistrationRequest registrationRequest);
+
     void updateUser(@MappingTarget User user, UserUpdateRequest request);
 //    default String map(MultipartFile avatarFile) {
 //        if (avatarFile == null) {

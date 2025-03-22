@@ -19,6 +19,7 @@ public class UserResponse {
     String email;
     String firstName;
     String lastName;
+    String gender;
     String address;
     String phoneNumber;
     @DateTimeFormat(pattern = "dd-MM-yyyy")

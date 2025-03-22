@@ -25,6 +25,9 @@ public class UserDetail extends BaseEntity {
     @Column(name = "uid", nullable = false, unique = true)
     private Long uid;
 
+    @Column(name = "gender")
+    private String gender;
+
     @Column(name = "address")
     private String address;
 

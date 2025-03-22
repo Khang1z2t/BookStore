@@ -2,11 +2,8 @@ package com.fis.backend.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +14,8 @@ public class UserUpdateRequest {
     String email;
     String firstName;
     String lastName;
+    String gender;
+    String address;
+    String phoneNumber;
+    Date dateOfBirth;
 }

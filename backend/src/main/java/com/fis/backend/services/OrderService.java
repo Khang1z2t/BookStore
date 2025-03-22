@@ -18,4 +18,6 @@ public interface OrderService {
     OrderResponse getOrderById(String id);
 
     List<OrderResponse> getAllOrderByStatus(String status);
+
+    List<OrderResponse> getAllOrderByUser();
 }

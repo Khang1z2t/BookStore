@@ -1,6 +1,7 @@
 package com.fis.backend.controller;
 
 import com.fis.backend.dto.ApiResponse;
+import com.fis.backend.dto.request.UserChangePassword;
 import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.UserResponse;
 import com.fis.backend.entity.User;
@@ -66,6 +67,23 @@ public class UserController {
             return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
                     .data("Cập nhật mật khẩu thất bại")
                     .build());
+        }
+    }
+
+    @PutMapping("/change-password")
+    @Operation(summary = "API thay đổi mật khẩu")
+    ResponseEntity<ApiResponse<Boolean>> changePassword(@RequestBody UserChangePassword request) {
+        try {
+            boolean result = userService.changePassword(request);
+            return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+                    .data(result)
+                    .build());
+        } catch (Exception e) {
+//            return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<Boolean>builder()
+//                    .data(false)
+//                    .build());
+            return ResponseEntity.status(NOT_FOUND)
+                    .body(new ApiResponse<>(403, "Mật khẩu cũ không đúng", false));
         }
     }
 

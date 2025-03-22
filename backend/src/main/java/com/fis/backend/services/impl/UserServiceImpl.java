@@ -3,6 +3,7 @@ package com.fis.backend.services.impl;
 import com.fis.backend.dto.identity.*;
 import com.fis.backend.dto.request.LoginRequest;
 import com.fis.backend.dto.request.RegistrationRequest;
+import com.fis.backend.dto.request.UserChangePassword;
 import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -141,12 +143,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(UserUpdateRequest request) {
         Long userId = AuthenUtil.getUserId();
-
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        userMapper.updateUser(user, request);
+        user.setEmail(request.getEmail());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
         userRepository.save(user);
+
+        UserDetail userDetail = user.getUserDetail();
+        userDetail.setAddress(request.getAddress());
+        userDetail.setPhoneNumber(request.getPhoneNumber());
+        userDetail.setUpdatedAt(Instant.now());
+        userDetail.setDateOfBirth(request.getDateOfBirth());
+
+        userDetailRepository.save(userDetail);
+
+        user.setUserDetail(userDetail);
         return userMapper.toUserResponse(user);
     }
 
@@ -209,6 +222,23 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public Boolean changePassword(UserChangePassword request) {
+        User user = userRepository.findById(AuthenUtil.getUserId()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if (!bCryptPasswordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        user.setPassword(bCryptPasswordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return true;
     }
 
     private TokenExchangeResponse getClientToken() {

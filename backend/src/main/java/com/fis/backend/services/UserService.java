@@ -1,9 +1,6 @@
 package com.fis.backend.services;
 
-import com.fis.backend.dto.request.LoginRequest;
-import com.fis.backend.dto.request.RegistrationRequest;
-import com.fis.backend.dto.request.UserRequest;
-import com.fis.backend.dto.request.UserUpdateRequest;
+import com.fis.backend.dto.request.*;
 import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,4 +31,6 @@ public interface UserService {
     String uploadImage(MultipartFile file);
 
     UserResponse getUserById(Long userId);
+
+    Boolean changePassword(UserChangePassword request);
 }
