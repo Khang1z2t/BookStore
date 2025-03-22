@@ -52,7 +52,7 @@
     <bpmn:boundaryEvent id="Event_0eg8gxj" attachedToRef="Receive_Order">
       <bpmn:outgoing>Flow_1vnuqct</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_079gjnp">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT7D</bpmn:timeDuration>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P7D</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0w0ymp4" sourceRef="Start_Process" targetRef="Start_Order" />

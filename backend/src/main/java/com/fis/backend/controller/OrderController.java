@@ -65,4 +65,10 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> receiveOrder(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.receiveOrder(id)));
     }
+
+    @GetMapping("/all/user")
+    @Operation(summary = "Get all by user")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllByUser() {
+        return ResponseEntity.ok(new ApiResponse<>(200, "", orderService.getAllOrderByUser()));
+    }
 }
