@@ -52,10 +52,19 @@ const getAllUser = async () => {
     const token = JSON.parse(localStorage.getItem('token'));
     const response = await httpRequest.get('/user/users', {
         headers: {
-            Authorization: `Bearer ${token.access_token}`
+            Authorization: `Bearer ${token?.access_token}`
         }
     });
     return response.data;
+}
+
+const changeUserPassword = async (data, token) => {
+    const response = await httpRequest.put('/user/change-password', data, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response?.data;
 }
 
 const exportPdf = async () => {
@@ -90,6 +99,31 @@ const getUserById = async (id) => {
     return response.data;
 }
 
+const sendVerification = async (email) => {
+    const response = await httpRequest.post(`/auth/send-verification?email=${email}`);
+    return response.data;
+}
+
+const verifyOtp = async (email, otp) => {
+    const response = await httpRequest.post(`/auth/verify-otp?email=${email}&otp=${otp}`);
+    return response.data;
+}
+
+const sendResetPassword = async (email) => {
+    const response = await httpRequest.post(`/auth/send-reset-password?email=${email}`);
+    return response.data;
+}
+
+const verifyResetPassword = async (email, otp) => {
+    const response = await httpRequest.post(`/auth/verify-reset-otp?email=${email}&otp=${otp}`);
+    return response.data;
+}
+
+const resetPassword = async (email, password) => {
+    const response = await httpRequest.put(`/auth/reset-password?email=${email}&password=${password}`);
+    return response.data;
+}
+
 export {
     loginUser,
     registerUser,
@@ -99,6 +133,12 @@ export {
     refreshToken,
     getUserRole,
     getAllUser,
+    changeUserPassword,
     exportPdf,
-    exportExcel
+    exportExcel,
+    sendVerification,
+    verifyOtp,
+    sendResetPassword,
+    verifyResetPassword,
+    resetPassword
 };

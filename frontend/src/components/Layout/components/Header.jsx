@@ -21,13 +21,14 @@ import {getUserProfile, getUserRole} from "~/services/UserService";
 import {useAlerts} from "~/context/AlertsContext";
 import CardButton from "~/components/Layout/components/CardButton";
 import {useCart} from "~/context/CartContext";
+import {useAuth} from "~/context/AuthContext";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
 function Header() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
-    const [user, setUser] = React.useState(null);
+    // const [user, setUser] = React.useState(null);
     const [role, setRole] = React.useState(null);
     const [settings, setSettings] = React.useState({
         profile: "Profile",
@@ -39,6 +40,7 @@ function Header() {
     const token = JSON.parse(localStorage.getItem('token'));
     const {showAlert} = useAlerts();
     const {updateCartCount} = useCart()
+    const {currentUser, getCurrentUser, logout} = useAuth()
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -94,36 +96,38 @@ function Header() {
         )
     }
 
-    const getUser = async () => {
-        const token = JSON.parse(localStorage.getItem('token'));
-        if (!token) {
-            setUser(null);
-            return;
-        }
-        try {
-            const response = await getUserProfile(token.access_token);
-            setUser(response.data);
-        } catch (error) {
-            localStorage.removeItem('token');
-            setUser(null);
-            navigate('/login');
-            showAlert('Failed to get user profile, please login again', 'error');
-        }
-    };
+    // const getUser = async () => {
+    //     const token = JSON.parse(localStorage.getItem('token'));
+    //     if (!token) {
+    //         setUser(null);
+    //         return;
+    //     }
+    //     try {
+    //         const response = await getUserProfile(token.access_token);
+    //         setUser(response.data);
+    //     } catch (error) {
+    //         localStorage.removeItem('token');
+    //         setUser(null);
+    //         navigate('/login');
+    //         showAlert('Failed to get user profile, please login again', 'error');
+    //     }
+    // };
 
     useEffect(() => {
-        getUser().then(r => r);
+        // getUser().then(r => r);
+        getCurrentUser()
         checkUserRole().then(r => r);
     }, [navigate, role]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
+        // localStorage.removeItem('token');
+        logout()
         setSettings(prevSettings => {
             const newSettings = {...prevSettings}; // Copy object cũ
             delete newSettings?.admin; // Xóa "Admin" nếu có
             return newSettings;
         });
-        setUser(null);
+        // setUser(null);
     }
 
     const checkUserRole = async () => {
@@ -233,13 +237,13 @@ function Header() {
                         <StyledInputBase placeholder="Search…" inputProps={{'aria-label': 'search'}}/>
                     </Search>
 
-                    {user ? (
+                    {currentUser ? (
                         <>
                             <CardButton/>
                             <Box sx={{flexGrow: 0}}>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                        <Avatar alt={user.username} src="/static/images/avatar/2.jpg"/>
+                                        <Avatar alt={currentUser.username} src="/static/images/avatar/2.jpg"/>
                                     </IconButton>
                                 </Tooltip>
                                 <Menu

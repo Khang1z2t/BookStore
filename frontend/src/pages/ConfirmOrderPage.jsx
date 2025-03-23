@@ -1,9 +1,9 @@
-import {Button, Card, Col, message, Radio, Row, Table, Typography} from "antd";
+import {Button, Card, Col, message, Radio, Row, Spin, Table, Typography} from "antd";
 import {useEffect, useState} from "react";
-import {CheckCircleOutlined} from "@ant-design/icons";
+import {CheckCircleOutlined, LoadingOutlined} from "@ant-design/icons";
 import GoogleImage from "~/components/GoogleImage";
 import {findProductById} from "~/services/ProductService";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {createOrder} from "~/services/OrderService";
 import {deleteCartByUser} from "~/services/CartService";
 import {useAlerts} from "~/context/AlertsContext";
@@ -11,17 +11,18 @@ import {useCart} from "~/context/CartContext";
 
 const {Title, Text} = Typography;
 
-function ConfirmOrderPage({onConfirmOrder}) {
+function ConfirmOrderPage() {
     const location = useLocation();
     const {cartItems = [], singleProductId = null} = location.state || {};
     const [paymentMethod, setPaymentMethod] = useState("cod");
-    const [products, setProducts] = useState([]);
     const [orderDetails, setOrderDetails] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [orderLoading, setOrderLoading] = useState(false);
     const {showAlert} = useAlerts();
     const {updateCartCount, cartCount} = useCart();
+    const navigate = useNavigate();
+    const CustomSpin = <Spin indicator={<LoadingOutlined style={{fontSize: 24, color: '#000'}} spin/>}/>;
     const columns = [
         {title: "STT", dataIndex: "index", key: "index", render: (_, __, i) => i + 1},
         {
@@ -58,7 +59,6 @@ function ConfirmOrderPage({onConfirmOrder}) {
     }
 
     const loadOrderDetails = async () => {
-        setLoading(true);
         try {
             let productList = []
 
@@ -93,34 +93,39 @@ function ConfirmOrderPage({onConfirmOrder}) {
     const handleOrder = async () => {
         setOrderLoading(true);
         const orderPayload = {
-            orderDetails: orderDetails.map(({productId, quantity}) => ({
-                productId,
-                quantity
+            orderDetails: orderDetails.map((item) => ({
+                productId: item.id ?? item.productId,
+                quantity: item.quantity
             }))
         };
         try {
             await createOrder(orderPayload);
-            message.success("Đã xác nhận đơn hàng!").then(r => r);
-            await deleteCartByUser()
+            showAlert("Đã xác nhận đơn hàng!", "success");
+            if (cartItems.length > 0) {
+                await deleteCartByUser();
+            }
         } catch (error) {
             console.log(error);
         } finally {
             setOrderLoading(false);
             updateCartCount();
-            showAlert("Đã xác nhận đơn hàng!", "success");
+            navigate("/profile")
         }
     }
 
 
     useEffect(() => {
         loadOrderDetails().then(r => r);
-    }, [cartItems, singleProductId]);
+    }, [JSON.stringify(cartItems), singleProductId]);
 
     return (
         <div className="container mx-auto p-6">
             <Card className="p-6 shadow-lg">
                 <Title level={3}>Xác nhận đơn hàng</Title>
-                <Table columns={columns} dataSource={orderDetails} loading={loading} rowKey="id" pagination={false}/>
+
+                <Table columns={columns} dataSource={orderDetails}
+                       loading={loading ? {indicator: CustomSpin} : false} rowKey="id"
+                       pagination={false}/>
 
                 <Row className="mt-6">
                     <Col span={24}>

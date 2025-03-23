@@ -7,6 +7,7 @@ import {createOrder} from "~/services/OrderService";
 import {useAlerts} from "~/context/AlertsContext";
 import {deleteCartByUser, deleteCartItem, getCart, updateCartItem} from "~/services/CartService";
 import {useCart} from "~/context/CartContext";
+import emptyImage from "~/assets/images/furina/catSad.png";
 
 
 const {Title, Text} = Typography;
@@ -168,14 +169,13 @@ function CartPage() {
 
     const handleOrder = async () => {
         try {
-            console.log(cart)
             navigate("/confirm-order", {state: {cartItems: cart}})
         } catch (error) {
             console.log(error);
         } finally {
             setOrderLoading(false);
             updateCartCount();
-            showAlert("Đã xác nhận đơn hàng!", "success");
+            // showAlert("Đã xác nhận đơn hàng!", "success");
         }
     }
 
@@ -195,12 +195,13 @@ function CartPage() {
                                 Thêm sản phẩm vào giỏ và quay lại trang này để thanh toán nha bạn ❤️
                             </Text>
                             <img
-                                src="https://img.itch.zone/aW1nLzUxMjk1NDYuanBn/original/nrtGQr.jpg"
+                                src={emptyImage}
                                 alt="Empty cart"
                                 className="w-48 h-48 mt-4 rounded-md"
                             />
                             <Link to="/">
-                                <Button type="primary" className="mt-4">Tiếp tục mua sắm</Button>
+                                <Button color={"default"} variant={"solid"}
+                                        className="mt-4">Tiếp tục mua sắm</Button>
                             </Link>
                         </Col>
 

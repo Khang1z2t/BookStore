@@ -38,10 +38,20 @@ const receiveOrder = async (id) => {
     return response.data;
 }
 
+const getAllByUser = async (token) => {
+    const response = await httpRequest.get('/order/all/user', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response.data;
+}
+
 export {
     getAllOrder,
     getAllOrderByStatus,
     findOrderById,
     createOrder,
-    receiveOrder
+    receiveOrder,
+    getAllByUser
 }

@@ -8,12 +8,13 @@ import NoLayout from "~/components/Layout/NoLayout";
 import CartPage from "~/pages/CartPage";
 import NotFoundPage from "~/pages/NotFoundPage";
 import ConfirmOrderPage from "~/pages/ConfirmOrderPage";
+import {ProfileUI} from "~/components/Layout/components/ProfileUI/ProfileUI";
 
 const publicRoutes = [
     {path: '/', component: Home},
     {path: '/login', component: SignIn},
     {path: '/register', component: SignUp},
-    {path: '/profile', component: Profile},
+    {path: '/profile', component: ProfileUI},
     {path: '/edit-profile', component: EditProfile},
     {path: '/cart', component: CartPage},
     {path: '/confirm-order', component: ConfirmOrderPage},

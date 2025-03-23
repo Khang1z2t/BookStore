@@ -4,14 +4,16 @@ import BookCard from "~/components/Book/BookCard";
 import {addToCart, getCart, updateCartItem} from "~/services/CartService";
 import {useAlerts} from "~/context/AlertsContext";
 import {useCart} from "~/context/CartContext";
+import {useNavigate} from "react-router-dom";
 
 
-function BookList({books, onBuy, onAddToCart, onClick}) {
+function BookList({books}) {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [confirmLoading, setConfirmLoading] = useState(false)
     const {showAlert} = useAlerts();
+    const navigate = useNavigate();
     const {updateCartCount} = useCart();
 
     // Mở popup khi ấn "Thêm giỏ hàng"
@@ -35,12 +37,16 @@ function BookList({books, onBuy, onAddToCart, onClick}) {
         updateCartCount();
     };
 
+    const handleBuy = (book) => {
+        navigate("/confirm-order", {state: {singleProductId: book.id}})
+    }
+
     return (
         <>
             <Row justify="start" align="top" gutter={[16, 16]} wrap={true}>
                 {books.map((book) => (
                     <Col key={book.id} xs={24} sm={12} md={8} lg={6} style={{display: 'flex'}}>
-                        <BookCard book={book} onBuy={onBuy} onAddToCart={() => handleAddToCart(book)}/>
+                        <BookCard book={book} onBuy={() => handleBuy(book)} onAddToCart={() => handleAddToCart(book)}/>
                     </Col>
                 ))}
             </Row>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,8 +16,11 @@ import MuiCard from '@mui/material/Card';
 import {styled} from '@mui/material/styles';
 import {FacebookIcon, GoogleIcon} from '~/components/CustomIcon';
 import styles from './SignUp.module.scss';
-import {registerUser} from '~/services/UserService';
+import {loginUser, registerUser, sendVerification, verifyOtp} from '~/services/UserService';
 import {useAlerts} from "~/context/AlertsContext";
+import {Form, Input, Modal, Button as AntButton} from "antd";
+import {useAuth} from "~/context/AuthContext";
+
 
 const Card = styled(MuiCard)(({theme}) => ({
     display: 'flex',
@@ -75,7 +78,13 @@ function SignUp({disableCustomTheme}) {
     const [lastNameError, setLastNameError] = React.useState(false);
     const [lastNameErrorMessage, setLastNameErrorMessage] = React.useState('');
     const {showAlert} = useAlerts();
-    const nagivate = useNavigate();
+    const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [loadingOtp, setLoadingOtp] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [otpTimer, setOtpTimer] = useState(60);
+    const navigate = useNavigate();
+    const {getCurrentUser} = useAuth();
 
 
     const validateInputs = () => {
@@ -146,30 +155,82 @@ function SignUp({disableCustomTheme}) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true)
         if (register) {
-            try {
-                console.log(register);
-                const response = await registerUser(register);
-                console.log(response);
+            await registerUser(register).then(async (res) => {
                 showAlert('Register Success', 'success');
-                nagivate('/login');
-            } catch (error) {
-                if (error.response) {
-                    // Server responded with a status other than 2xx
-                    showAlert(error.response.data.message, 'error');
-                    console.error('Login failed:', error.response.data.message);
-                } else if (error.request) {
-                    // Request was made but no response received
-                    showAlert('Network error, please try again later', 'error');
-                    console.error('Network error:', error.message);
-                } else {
-                    // Something else happened
-                    showAlert('An unexpected error occurred', 'error');
-                    console.error('Error:', error.message);
-                }
-            }
+                await sendVerification(register.email).then(() => {
+                    setIsOtpModalVisible(true);
+                })
+            }).catch((err) => {
+                showAlert(err.response?.data?.message || 'Network error, please try again later' || 'An unexpected error occurred', 'error');
+                console.error('Error:', err.message);
+            }).finally(() => {
+                setLoading(false)
+            })
+
         }
     };
+
+    const getToken = async (username, password) => {
+        await loginUser(username, password).then((res) => {
+            const {access_token, refresh_token} = res.data;
+            const token = {access_token, refresh_token};
+            localStorage.setItem('token', JSON.stringify(token));
+            showAlert('Login Success', 'success');
+            getCurrentUser();
+            navigate('/');
+        });
+    }
+
+
+    const handleOtpSubmit = async () => {
+        setLoading(true);
+        // Giả sử bạn có API để verify OTP, gửi kèm thông tin user (ví dụ: email hoặc ID từ register)
+        await verifyOtp(register.email, otp).then(async (res) => {
+            if (res?.data) {
+                setIsOtpModalVisible(false);
+                await getToken(register.username, register.password);
+            } else {
+                showAlert('OTP verification failed', 'error');
+            }
+        }).catch((err) => {
+            showAlert('OTP verification failed', 'error');
+            console.error('OTP Error:', err.message);
+        }).finally(() => {
+            setLoading(false);
+            setOtp('');
+        });
+    };
+
+    const handleModalCancel = () => {
+        setIsOtpModalVisible(false);
+        setOtp('');
+    };
+
+    const handleResendOtp = async () => {
+        setLoadingOtp(true);
+        try {
+            // Gọi API gửi lại OTP
+            await sendVerification(register?.email);
+            showAlert('OTP đã được gửi lại', 'success');
+            setOtpTimer(60); // Reset timer
+        } catch (err) {
+            showAlert('Không thể gửi lại OTP', 'error');
+        } finally {
+            setLoadingOtp(false);
+        }
+    };
+
+    useEffect(() => {
+        let timer;
+        if (isOtpModalVisible && otpTimer > 0) {
+            timer = setInterval(() => {
+                setOtpTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [isOtpModalVisible, otpTimer]);
 
     return (
         <>
@@ -290,7 +351,9 @@ function SignUp({disableCustomTheme}) {
                                 userSelect: 'none',
                             }}
                         />
-                        <Button type="submit" fullWidth variant="contained" onClick={validateInputs} color="inherit">
+                        <Button type="submit" loading={loading} loadingPosition="start" fullWidth variant="contained"
+                                onClick={validateInputs}
+                                color="inherit">
                             Sign up
                         </Button>
                     </Box>
@@ -335,6 +398,57 @@ function SignUp({disableCustomTheme}) {
                     </Box>
                 </Card>
             </SignUpContainer>
+            {/* Modal OTP */}
+            <Modal
+                title={<h3 className="text-xl font-semibold">Xác nhận OTP</h3>}
+                open={isOtpModalVisible}
+                onCancel={handleModalCancel}
+                footer={
+                    null
+                }
+                width={400}
+                className="rounded-lg"
+                bodyStyle={{padding: '24px'}}
+            >
+                <Form onFinish={handleOtpSubmit}>
+                    <p className="mb-4 text-gray-600">
+                        Vui lòng nhập mã OTP được gửi đến email của bạn:
+                    </p>
+                    <Form.Item
+                        name="otp"
+                        rules={[
+                            {required: true, message: 'Vui lòng nhập OTP!'},
+                            {len: 6, message: 'OTP phải có 6 ký tự!'}
+                        ]}
+                    >
+                        <Input
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            placeholder="Nhập OTP (6 chữ số)"
+                            maxLength={6}
+                            className="w-full border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                        />
+                    </Form.Item>
+                    <Form.Item>
+                        <div className="flex justify-end gap-2">
+                            <AntButton onClick={handleResendOtp} disabled={otpTimer !== 0 || loadingOtp}>
+                                Gửi lại OTP
+                            </AntButton>
+                            <AntButton onClick={handleModalCancel} className="border-gray-300">
+                                Hủy
+                            </AntButton>
+                            <AntButton
+                                type="primary"
+                                htmlType="submit"
+                                loading={loading}
+                                className="bg-blue-500 hover:bg-blue-600"
+                            >
+                                Xác nhận
+                            </AntButton>
+                        </div>
+                    </Form.Item>
+                </Form>
+            </Modal>
         </>
     );
 }

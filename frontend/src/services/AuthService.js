@@ -43,4 +43,6 @@ const refreshUserToken = async (token, navigate) => {
         navigate('/login');
     }
 }
+
+
 export {getUser, refreshUserToken};
