@@ -12,6 +12,7 @@ export const ProfileCard = ({data, setActiveTab}) => {
         <Card className="shadow-md rounded-lg p-6 bg-white border border-gray-300">
             <div className="flex flex-col items-center text-center">
                 <Avatar children={data.username.charAt(0)} size={90} src={config.getImage(data.avatarUrl) || ""}
+
                         className="border border-gray-400"/>
                 <h2 className="mt-3 text-xl font-semibold text-black">{data.username}</h2>
                 <p className="text-gray-600">{data.firstName} {data.lastName}</p>
