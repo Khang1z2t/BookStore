@@ -70,9 +70,9 @@ public class AuthController {
 
     @PostMapping("/verify-otp")
     @Operation(summary = "API xác thực OTP mail")
-    ResponseEntity<ApiResponse<String>> verifyOtpMail(@RequestParam String email, @RequestParam String otp) {
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .data(userService.verifyOtpMail(email, otp) ? "Xác thực thành công" : "Xác thực thất bại")
+    ResponseEntity<ApiResponse<Boolean>> verifyOtpMail(@RequestParam String email, @RequestParam String otp) {
+        return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+                .data(userService.verifyOtpMail(email, otp))
                 .build());
     }
 
@@ -86,9 +86,9 @@ public class AuthController {
 
     @PostMapping("/verify-reset-otp")
     @Operation(summary = "API xác thực OTP reset password")
-    ResponseEntity<ApiResponse<String>> verifyOtpResetPass(@RequestParam String email, @RequestParam String otp) {
-        return ResponseEntity.ok(ApiResponse.<String>builder()
-                .data(userService.verifyOtpResetPass(email, otp) ? "Xác thực thành công" : "Xác thực thất bại")
+    ResponseEntity<ApiResponse<Boolean>> verifyOtpResetPass(@RequestParam String email, @RequestParam String otp) {
+        return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+                .data(userService.verifyOtpResetPass(email, otp))
                 .build());
     }
 
