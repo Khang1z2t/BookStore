@@ -1,7 +1,37 @@
 import {Button, Col, DatePicker, Form, Input, message, Row, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
+import {useEffect, useState} from "react";
 
-function ProductInput({form, onFinish}) {
+function ProductInput({form, onFinish, initialValues}) {
+    const [fileList, setFileList] = useState([]); // Lưu danh sách file
+
+    // Điền dữ liệu ban đầu vào form khi có initialValues (dùng cho edit)
+    useEffect(() => {
+        if (initialValues) {
+            form.setFieldsValue(initialValues);
+            // Nếu có ảnh (imageUrl), hiển thị trong Upload
+            if (initialValues.imageUrl) {
+                setFileList([
+                    {
+                        uid: '-1',
+                        name: 'image.png',
+                        status: 'done',
+                        url: initialValues.imageUrl, // URL của ảnh hiện tại
+                    },
+                ]);
+            }
+        } else {
+            form.resetFields();
+            setFileList([]);
+        }
+    }, [initialValues, form]);
+
+    // Xử lý khi file thay đổi
+    const handleUploadChange = ({fileList: newFileList}) => {
+        setFileList(newFileList);
+        // Lưu file vào form để gửi lên API
+        form.setFieldsValue({image: newFileList[0]?.originFileObj || null});
+    };
     return (
         <Form
             form={form}
@@ -58,18 +88,11 @@ function ProductInput({form, onFinish}) {
                     <Form.Item name="image" label="Image">
                         <Upload
                             name="file"
-                            action="/upload.do" // Thay đổi endpoint nếu cần
+                            // action="/"
                             listType="picture"
                             maxCount={1}
-                            onChange={(info) => {
-                                if (info.file.status === 'done') {
-                                    message.success(`${info.file.name} tải lên thành công`)
-                                        .then(r => r);
-                                } else if (info.file.status === 'error') {
-                                    message.error(`${info.file.name} tải lên thất bại`)
-                                        .then(r => r);
-                                }
-                            }}
+                            onChange={handleUploadChange}
+                            beforeUpload={() => false}
                         >
                             <Button icon={<UploadOutlined/>}>Click to Upload</Button>
                         </Upload>

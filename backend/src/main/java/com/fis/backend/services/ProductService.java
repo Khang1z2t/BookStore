@@ -11,9 +11,9 @@ public interface ProductService {
 
     ProductResponse getProductById(String productId);
 
-    ProductResponse updateProduct(ProductRequest productRequest);
+    ProductResponse updateProduct(String id, ProductRequest productRequest);
 
-    Boolean deleteProduct(Long productId);
+    Boolean deleteProduct(String productId);
 
     ProductResponse getProduct(String productId);
 

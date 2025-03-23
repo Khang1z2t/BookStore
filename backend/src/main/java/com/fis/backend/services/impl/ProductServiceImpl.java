@@ -51,13 +51,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(ProductRequest productRequest) {
-        return null;
+    public ProductResponse updateProduct(String id, ProductRequest productRequest) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setName(productRequest.getName());
+        product.setPrice(productRequest.getPrice());
+        product.setQuantity(productRequest.getQuantity());
+        product.setDescription(productRequest.getDescription());
+        productRepository.save(product);
+        return productMapper.toProductResponse(product);
     }
 
     @Override
-    public Boolean deleteProduct(Long productId) {
-        return null;
+    public Boolean deleteProduct(String productId) {
+        var product = productRepository.findById(productId).orElseThrow(
+                ()-> new RuntimeException("Product not found"));
+        productRepository.delete(product);
+        return true;
     }
 
     @Override

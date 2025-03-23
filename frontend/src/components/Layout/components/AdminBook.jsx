@@ -1,9 +1,9 @@
 import {Alert, Button, Card, Form, Modal, Spin, Table, Typography} from "antd";
 import {useEffect, useState} from "react";
 import {useAlerts} from "~/context/AlertsContext";
-import {getAllProduct} from "~/services/ProductService";
+import {addProduct, getAllProduct, updateProduct} from "~/services/ProductService";
 import GoogleImage from "~/components/GoogleImage";
-import {LoadingOutlined, ReloadOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, LoadingOutlined, ReloadOutlined} from "@ant-design/icons";
 import ProductInput from "~/components/AdminInput/ProductInput";
 import toast from "react-hot-toast";
 
@@ -16,6 +16,8 @@ function AdminBook() {
     const [error, setError] = useState(null);
     const {showAlert} = useAlerts();
     const [visible, setVisible] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editProduct, setEditProduct] = useState(null);
     const [form] = Form.useForm();
     const columns = [
         {
@@ -68,6 +70,27 @@ function AdminBook() {
             render: (value) =>
                 value ? new Date(value).toLocaleDateString('en-GB') : 'Chưa có',
         },
+        {
+            title: 'Hành động',
+            dataIndex: 'action',
+            key: 'action',
+            render: (_, record) => (
+                <div>
+                    <Button
+                        color="default" variant="outlined"
+                        onClick={() => openEditModal(record)}
+                        icon={<EditOutlined/>}
+                    >
+                    </Button>
+                    <Button
+                        color="danger" variant="outlined"
+                        onClick={() => handleDelete(record)}
+                        icon={<DeleteOutlined/>}
+                    >
+                    </Button>
+                </div>
+            )
+        }
     ]
 
     const fetchProduct = async () => {
@@ -83,6 +106,26 @@ function AdminBook() {
         }
     }
 
+    const openAddModal = () => {
+        setIsEdit(false);
+        setEditProduct(null);
+        setVisible(true);
+    };
+
+    const openEditModal = (product) => {
+        setIsEdit(true);
+        setEditProduct(product);
+        setVisible(true);
+    };
+
+    const handleAdd = async () => {
+
+    }
+
+    const handleDelete = async (record) => {
+        console.log('Delete:', record)
+    }
+
     useEffect(() => {
         fetchProduct().then(r => r)
     }, []);
@@ -95,9 +138,23 @@ function AdminBook() {
         toast.success("Export Excel")
     }
 
-    const handleFinish = (values) => {
-        console.log('Form values:', values);
-        // Gọi API thêm người dùng ở đây
+    const handleFinish = async (values) => {
+        if (isEdit) {
+            await updateProduct(editProduct.id, values).then((res) => {
+                console.log('Cập nhật sản phẩm:', res);
+                showAlert("Sửa sản phẩm thành công", 'success');
+            }).catch(error => {
+                showAlert(error.message, 'error');
+            })
+        } else {
+            await addProduct(values).then((res) => {
+                console.log('Thêm sản phẩm:', res);
+                showAlert("Thêm sản phẩm thành công", 'success');
+            }).catch(error => {
+                showAlert(error.message, 'error');
+            })
+        }
+        await fetchProduct();
         setVisible(false);
         form.resetFields();
     };
@@ -143,7 +200,7 @@ function AdminBook() {
                 </div>
                 <Button color="default"
                         variant="solid"
-                        onClick={() => setVisible(true)}>
+                        onClick={openAddModal}>
                     Add
                 </Button>
                 <Modal
@@ -162,7 +219,7 @@ function AdminBook() {
                         xl: '50%',
                         xxl: '40%',
                     }}>
-                    <ProductInput form={form} onFinish={handleFinish}/>
+                    <ProductInput form={form} onFinish={handleFinish} initialValues={editProduct}/>
                 </Modal>
             </div>
 
