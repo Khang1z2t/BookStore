@@ -20,7 +20,7 @@ public interface UserService {
 
     Boolean deleteUser(Long userId);
 
-    Boolean resetPassword(String newPassword);
+    Boolean resetPassword(String email, String newPassword);
 
     Boolean checkUserRole();
 
@@ -33,4 +33,12 @@ public interface UserService {
     UserResponse getUserById(Long userId);
 
     Boolean changePassword(UserChangePassword request);
+
+    Boolean sendVerifyMail(String email);
+
+    Boolean verifyOtpMail(String email, String otp);
+
+    Boolean sendVerifyResetPass(String email);
+
+    Boolean verifyOtpResetPass(String email, String otp);
 }

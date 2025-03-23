@@ -7,6 +7,7 @@ import com.fis.backend.dto.request.UserChangePassword;
 import com.fis.backend.dto.request.UserUpdateRequest;
 import com.fis.backend.dto.response.AuthenticationResponse;
 import com.fis.backend.dto.response.UserResponse;
+import com.fis.backend.entity.Otp;
 import com.fis.backend.entity.User;
 import com.fis.backend.entity.UserDetail;
 import com.fis.backend.exception.AppException;
@@ -17,6 +18,8 @@ import com.fis.backend.repository.KeycloakRepository;
 import com.fis.backend.repository.UserDetailRepository;
 import com.fis.backend.repository.UserRepository;
 import com.fis.backend.services.GoogleDriveService;
+import com.fis.backend.services.MailService;
+import com.fis.backend.services.OtpService;
 import com.fis.backend.services.UserService;
 import com.fis.backend.utils.AuthenUtil;
 import com.fis.backend.utils.enums.FolderType;
@@ -27,11 +30,15 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
@@ -47,6 +54,8 @@ public class UserServiceImpl implements UserService {
     KeycloakRepository keycloakRepository;
     ErrorNormalizer errorNormalizer;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final MailService mailService;
+    private final OtpService otpService;
 
     @Value("${keycloak.client-id}")
     @NonFinal
@@ -176,7 +185,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean resetPassword(String newPassword) {
+    public Boolean resetPassword(String email, String newPassword) {
         Long userId = AuthenUtil.getUserId();
 
         var user = userRepository.findById(userId).orElseThrow(
@@ -241,12 +250,77 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    @Override
+    public Boolean sendVerifyMail(String email) {
+        var user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(ErrorCode.INVALID_EMAIL));
+        var otpCode = otpService.generateOtp(user.getEmail());
+        String emailBody = loadOtpEmailTemplate(user.getUsername(), otpCode, "verify");
+        mailService.sendEmail(user.getEmail(), otpCode + " là mã xác nhận của bạn.", emailBody);
+        return true;
+    }
+
+    @Override
+    public Boolean verifyOtpMail(String email, String otp) {
+        return otpService.verifyOtp(email, otp);
+    }
+
+    @Override
+    public Boolean sendVerifyResetPass(String email) {
+        var user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(ErrorCode.INVALID_EMAIL));
+        var otpCode = otpService.generateOtp(user.getEmail());
+        String emailBody = loadOtpEmailTemplate(user.getUsername(), otpCode, "reset");
+        mailService.sendEmail(user.getEmail(), otpCode + " là mã xác nhận của bạn.", emailBody);
+        return true;
+    }
+
+    @Override
+    public Boolean verifyOtpResetPass(String email, String otp) {
+        return otpService.verifyOtp(email, otp);
+    }
+
     private TokenExchangeResponse getClientToken() {
         return keycloakRepository.exchangeToken(TokenExchangeParam.builder()
                 .grant_type("client_credentials")
                 .client_id(clientId)
                 .client_secret(clientSecret)
                 .build());
+    }
+
+
+    private String loadOtpEmailTemplate(String username, String otpCode, String typeEmail) {
+        try {
+            Path path = new ClassPathResource("static/otp_email.html").getFile().toPath();
+            String emailBody = Files.readString(path, StandardCharsets.UTF_8);
+
+            String title;
+            String message;
+            String footerMessage;
+
+            if ("verify".equalsIgnoreCase(typeEmail)) {
+                title = "Xác minh email";
+                message = "Đây là mã OTP của bạn để xác minh địa chỉ email. Vui lòng sử dụng mã này trong vòng 30 phút:";
+                footerMessage = "Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email hoặc liên hệ với chúng tôi.";
+            } else if ("reset".equalsIgnoreCase(typeEmail)) {
+                title = "Đặt lại mật khẩu";
+                message = "Đây là mã OTP của bạn để đặt lại mật khẩu. Vui lòng sử dụng mã này trong vòng 30 phút:";
+                footerMessage = "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.";
+            } else {
+                throw new IllegalArgumentException("Loại email không hợp lệ: " + typeEmail);
+            }
+
+            // Thay thế các placeholder
+            emailBody = emailBody.replace("{{title}}", title);
+            emailBody = emailBody.replace("{{username}}", username.toUpperCase());
+            emailBody = emailBody.replace("{{message}}", message);
+            emailBody = emailBody.replace("{{otpCode}}", otpCode);
+            emailBody = emailBody.replace("{{footerMessage}}", footerMessage);
+
+            return emailBody;
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể load template email OTP", e);
+        }
     }
 
 }

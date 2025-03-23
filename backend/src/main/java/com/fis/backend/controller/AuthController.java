@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -56,4 +58,53 @@ public class AuthController {
                 .data(userService.checkUserRole() ? "admin" : "user")
                 .build());
     }
+
+    @PostMapping("/send-verification")
+    @Operation(summary = "API gửi mail xác thực")
+    ResponseEntity<ApiResponse<String>> sendVerifyMail(@RequestParam String email) {
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .data(userService.sendVerifyMail(email) ? "Gửi mail thành công" : "Gửi mail thất bại")
+                .build());
+    }
+
+
+    @PostMapping("/verify-otp")
+    @Operation(summary = "API xác thực OTP mail")
+    ResponseEntity<ApiResponse<String>> verifyOtpMail(@RequestParam String email, @RequestParam String otp) {
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .data(userService.verifyOtpMail(email, otp) ? "Xác thực thành công" : "Xác thực thất bại")
+                .build());
+    }
+
+    @PostMapping("/send-reset-password")
+    @Operation(summary = "API gửi mail xác thực reset password")
+    ResponseEntity<ApiResponse<String>> sendVerifyResetPass(@RequestParam String email) {
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .data(userService.sendVerifyResetPass(email) ? "Gửi mail thành công" : "Gửi mail thất bại")
+                .build());
+    }
+
+    @PostMapping("/verify-reset-otp")
+    @Operation(summary = "API xác thực OTP reset password")
+    ResponseEntity<ApiResponse<String>> verifyOtpResetPass(@RequestParam String email, @RequestParam String otp) {
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .data(userService.verifyOtpResetPass(email, otp) ? "Xác thực thành công" : "Xác thực thất bại")
+                .build());
+    }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "API reset mật khẩu")
+    ResponseEntity<ApiResponse<String>> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+        try {
+            boolean result = userService.resetPassword(email, newPassword);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .data(result ? "Cập nhật mật khẩu thành công" : "Cập nhật mật khẩu thất bại")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
+                    .data("Cập nhật mật khẩu thất bại")
+                    .build());
+        }
+    }
+
 }

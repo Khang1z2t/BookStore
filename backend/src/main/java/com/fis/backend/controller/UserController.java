@@ -55,20 +55,7 @@ public class UserController {
                 .build());
     }
 
-    @PutMapping("/reset-password")
-    @Operation(summary = "API reset mật khẩu")
-    ResponseEntity<ApiResponse<String>> resetPassword(@RequestParam String newPassword) {
-        try {
-            boolean result = userService.resetPassword(newPassword);
-            return ResponseEntity.ok(ApiResponse.<String>builder()
-                    .data(result ? "Cập nhật mật khẩu thành công" : "Cập nhật mật khẩu thất bại")
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(NOT_FOUND).body(ApiResponse.<String>builder()
-                    .data("Cập nhật mật khẩu thất bại")
-                    .build());
-        }
-    }
+
 
     @PutMapping("/change-password")
     @Operation(summary = "API thay đổi mật khẩu")
