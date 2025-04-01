@@ -1,8 +1,7 @@
-package com.fis.backend.repository;
+package com.fis.backend.integration;
 
 import com.fis.backend.dto.identity.*;
 import feign.QueryMap;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,6 @@ public interface KeycloakRepository {
             @RequestHeader("Authorization") String token,
             @PathVariable("userId") String userId,
             @RequestBody UserUpdateParam param);
-
 
     @DeleteMapping(value = "/admin/realms/bookstore/users/{userId}",
             consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -5,6 +5,7 @@ import com.fis.backend.dto.ApiResponse;
 import com.fis.backend.exception.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -30,5 +31,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
         response.flushBuffer();
+    }
+
+    @Qualifier
+    public @interface JwtAuthenticationEntryPointQualifier {
     }
 }
